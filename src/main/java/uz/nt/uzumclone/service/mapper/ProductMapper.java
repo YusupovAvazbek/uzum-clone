@@ -8,6 +8,7 @@ import uz.nt.uzumclone.model.Product;
 
 @Mapper(componentModel = "spring")
 public abstract class ProductMapper implements CommonMapper<ProductDto, Product> {
+
     @Autowired
     protected CategoryMapper categoryMapper;
 

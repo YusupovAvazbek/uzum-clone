@@ -1,12 +1,10 @@
 package uz.nt.uzumclone.model;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uz.nt.uzumclone.dto.CategoryDto;
 
 @Getter
 @Setter

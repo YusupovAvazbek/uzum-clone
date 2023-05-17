@@ -29,12 +29,11 @@ public class CategoryServiceImpl implements CategoryService {
                     ))
                     .message(OK)
                     .success(true)
-                    .build()
-                    ;
+                    .build();
         }catch (Exception e){
             return ResponseDto.<CategoryDto>builder()
                     .code(DATABASE_ERROR_CODE)
-                    .message(DATABASE_ERROR + ": " + e.getMessage())
+                    .message(DATABASE_ERROR + " : " + e.getMessage())
                     .data(categoryDto)
                     .build();
         }
