@@ -17,5 +17,4 @@ public class UsersDto{
     private String gender;
     private String password;
     private Date birthDate;
-    private String role;
 }
