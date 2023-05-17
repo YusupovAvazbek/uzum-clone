@@ -9,7 +9,7 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.service.ProductService;
 
 @RestController
-@RequestMapping("product")
+@RequestMapping("/product")
 @RequiredArgsConstructor
 public class ProductResources {
 
@@ -25,13 +25,13 @@ public class ProductResources {
         return productService.updateProduct(productDto);
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseDto<Page<ProductDto>> getAllProducts(@RequestParam(defaultValue = "10") Integer size,
                                                                      @RequestParam(defaultValue = "0") Integer page){
         return productService.getAllProducts(page, size);
     }
 
-    @GetMapping("by-id")
+    @GetMapping("/by-id")
     public ResponseDto<ProductDto> getProductById(@RequestParam Integer id){
         return productService.getProductById(id);
     }

@@ -1,6 +1,7 @@
 package uz.nt.uzumclone.service.Impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UsersDto;
 import uz.nt.uzumclone.model.Users;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 import static uz.nt.uzumclone.additional.AppStatusCodes.*;
 import static uz.nt.uzumclone.additional.AppStatusMessages.*;
-
+@Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UsersService {
     private final UsersMapper userMapper;

@@ -11,12 +11,12 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.service.impl.CategoryServiceImpl;
 
 @RestController
-@RequestMapping("category")
+@RequestMapping("/category")
 @RequiredArgsConstructor
 public class CategoryResources {
 
     private final CategoryServiceImpl categoryService;
-    @PostMapping("add")
+    @PostMapping
     public ResponseDto<CategoryDto> addCategory(@RequestBody @Valid CategoryDto categoryDto){
         return categoryService.addCategory(categoryDto);
     }

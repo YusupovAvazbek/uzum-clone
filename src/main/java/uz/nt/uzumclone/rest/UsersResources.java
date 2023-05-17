@@ -19,7 +19,7 @@ public class UsersResources {
     public ResponseDto<UsersDto> updateUser(@RequestBody UsersDto usersDto){
         return usersService.updateUser(usersDto);
     }
-    @GetMapping("by-phone-number")
+    @GetMapping("/by-phone-number")
     public ResponseDto<UsersDto> getUserByPhoneNumber(@RequestParam String phoneNumber){
         return usersService.getUserByPhoneNumber(phoneNumber);
     }
