@@ -1,13 +1,12 @@
 package uz.nt.uzumclone.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -22,4 +21,10 @@ public class Address {
     private String info;
     private String code;
     private String phoneNumber;
+    @ManyToMany
+    @JoinTable(
+            name = "user_address",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id"))
+    private List<Users> users;
 }
