@@ -18,6 +18,5 @@ public class CategoryDto {
     private Integer id;
     @NotBlank(message = EMPTY_STRING)
     private String name;
-    @Positive(message = NEGATIVE_VALUE)
-    private Integer parentId;
+    private CategoryDto parentCategory;
 }
