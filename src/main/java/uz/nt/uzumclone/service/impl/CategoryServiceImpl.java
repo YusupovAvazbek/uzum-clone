@@ -1,4 +1,4 @@
-package uz.nt.uzumclone.service.impl;
+package uz.nt.uzumclone.service.Impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

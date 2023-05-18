@@ -6,6 +6,7 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UsersDto;
 import uz.nt.uzumclone.model.Users;
 import uz.nt.uzumclone.repository.UsersRepository;
+import uz.nt.uzumclone.service.CartService;
 import uz.nt.uzumclone.service.UsersService;
 import uz.nt.uzumclone.service.mapper.UsersMapper;
 
@@ -18,12 +19,13 @@ import static uz.nt.uzumclone.additional.AppStatusMessages.*;
 public class UserServiceImpl implements UsersService {
     private final UsersMapper userMapper;
     private final UsersRepository usersRepository;
+    private final CartService cartService;
     @Override
     public ResponseDto<UsersDto> addUser(UsersDto dto) {
         try {
             Users users = userMapper.toEntity(dto);
             usersRepository.save(users);
-
+            cartService.createCart(users);
             return ResponseDto.<UsersDto>builder()
                     .success(true)
                     .data(userMapper.toDto(users))
@@ -65,22 +67,7 @@ public class UserServiceImpl implements UsersService {
         if (usersDto.getLastName() != null) {
             user.setLastName(usersDto.getLastName());
         }
-        if (usersDto.getMiddleName() != null) {
-            user.setMiddleName(usersDto.getMiddleName());
-        }
-        if (usersDto.getEmail() != null) {
-            user.setEmail(usersDto.getEmail());
-        }
-        if (usersDto.getGender() != null) {
-            user.setGender(usersDto.getGender());
-        }
 
-        if (usersDto.getPhoneNumber() != null) {
-            user.setPhoneNumber(usersDto.getPhoneNumber());
-        }
-        if (usersDto.getBirthDate() != null) {
-            user.setBirthDate(usersDto.getBirthDate());
-        }
         try {
             usersRepository.save(user);
 

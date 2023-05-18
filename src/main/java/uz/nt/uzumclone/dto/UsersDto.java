@@ -1,6 +1,11 @@
 package uz.nt.uzumclone.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -10,11 +15,10 @@ import java.util.Date;
 public class UsersDto{
     private Integer id;
     private String phoneNumber;
+    private String username;
     private String firstName;
     private String lastName;
-    private String middleName;
     private String email;
-    private String gender;
     private String password;
-    private Date birthDate;
+
 }
