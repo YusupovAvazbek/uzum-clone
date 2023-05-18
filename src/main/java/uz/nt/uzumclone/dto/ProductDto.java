@@ -20,11 +20,9 @@ public class ProductDto {
     private String name;
     @Positive(message = NEGATIVE_VALUE)
     private Double price;
-    //@Size(message = NEGATIVE_VALUE)
     private Integer amount;
     @NotBlank(message = EMPTY_STRING)
     private String description;
-//    @NotBlank(message = NULL_VALUE)
     private CategoryDto category;
     private Boolean isAvailable;
 }
