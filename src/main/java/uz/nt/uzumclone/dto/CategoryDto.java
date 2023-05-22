@@ -17,5 +17,5 @@ public class CategoryDto {
     private Integer id;
     @NotBlank(message = EMPTY_STRING)
     private String name;
-    private List<CategoryDto> parentCategory;
+    private CategoryDto parentCategory;
 }

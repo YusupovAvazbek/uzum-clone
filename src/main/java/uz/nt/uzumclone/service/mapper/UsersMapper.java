@@ -14,4 +14,6 @@ public abstract class UsersMapper implements CommonMapper<UsersDto, Users>{
     abstract public Users toEntity(UsersDto dto);
     @Override
     abstract public UsersDto toDto(Users entity);
+
+    abstract public Users toEntityPassword(UsersDto usersDto);
 }
