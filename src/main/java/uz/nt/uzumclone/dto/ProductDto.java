@@ -2,14 +2,13 @@ package uz.nt.uzumclone.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uz.nt.uzumclone.enums.Color;
 
-import static uz.nt.uzumclone.additional.AppStatusMessages.*;
+import static uz.nt.uzumclone.additional.AppStatusMessages.EMPTY_STRING;
+import static uz.nt.uzumclone.additional.AppStatusMessages.NEGATIVE_VALUE;
 
 @Getter
 @Setter
@@ -25,6 +24,5 @@ public class ProductDto {
     @NotBlank(message = EMPTY_STRING)
     private String description;
     private CategoryDto category;
-    private Color color;
     private Boolean isAvailable;
 }
