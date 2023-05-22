@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uz.nt.uzumclone.enums.Color;
 
 import static uz.nt.uzumclone.additional.AppStatusMessages.*;
 
@@ -24,5 +25,6 @@ public class ProductDto {
     @NotBlank(message = EMPTY_STRING)
     private String description;
     private CategoryDto category;
+    private Color color;
     private Boolean isAvailable;
 }

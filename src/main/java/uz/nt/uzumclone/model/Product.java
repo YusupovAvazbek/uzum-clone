@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uz.nt.uzumclone.enums.Color;
 
 @Getter
 @Setter
@@ -22,5 +23,7 @@ public class Product {
     private String description;
     @ManyToOne
     private Category category;
+    @Enumerated(EnumType.STRING)
+    private Color color;
     private Boolean isAvailable;
 }
