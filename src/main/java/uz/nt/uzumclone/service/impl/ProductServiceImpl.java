@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import uz.nt.uzumclone.dto.BrandDto;
 import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
+import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.repository.ProductRepository;
+import uz.nt.uzumclone.service.BrandServices;
 import uz.nt.uzumclone.service.ProductService;
 import uz.nt.uzumclone.service.mapper.CategoryMapper;
 import uz.nt.uzumclone.service.mapper.ProductMapper;
@@ -24,11 +27,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
+    private final BrandServices brandServices;
 
     @Override
     public ResponseDto<ProductDto> addProduct(ProductDto productDto) {
+        Brand brand = brandServices.addBrand(productDto.getBrand());
         Product product = productMapper.toEntity(productDto);
-        try{
+        product.setBrand(brand);
+        try {
             productRepository.save(product);
 
             return ResponseDto.<ProductDto>builder()
@@ -36,13 +42,13 @@ public class ProductServiceImpl implements ProductService {
                     .data(productMapper.toDto(product))
                     .message("OK")
                     .build();
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseDto.<ProductDto>builder()
                     .code(DATABASE_ERROR_CODE)
                     .message(DATABASE_ERROR + e.getMessage())
                     .build();
         }
-        
+
     }
 
     @Override
@@ -78,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
         if (productDto.getDescription() != null) {
             product.setDescription(productDto.getDescription());
         }
-        if(productDto.getCategory() != null) {
+        if (productDto.getCategory() != null) {
             product.setCategory(categoryMapper.toEntity(productDto.getCategory()));
         }
 

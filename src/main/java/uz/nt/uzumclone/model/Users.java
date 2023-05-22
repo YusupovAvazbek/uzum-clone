@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -28,6 +29,8 @@ public class Users {
     private boolean enabled;
     @Column(columnDefinition = "text default('USER')")
     private String role;
+    @OneToMany
+    private List<Product> favorited;
     @CreatedDate
     @CreationTimestamp
     private LocalDateTime createdAt;
