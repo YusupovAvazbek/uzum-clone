@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
+import uz.nt.uzumclone.service.Impl.ProductServiceImpl;
 import uz.nt.uzumclone.service.ProductService;
 
 @RestController
@@ -13,7 +14,7 @@ import uz.nt.uzumclone.service.ProductService;
 @RequiredArgsConstructor
 public class ProductResources {
 
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
     @PostMapping
     public ResponseDto<ProductDto> addProduct(@RequestBody @Valid ProductDto productDto){

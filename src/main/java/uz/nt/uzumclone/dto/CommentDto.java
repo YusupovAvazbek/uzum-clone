@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,6 +15,6 @@ public class CommentDto {
     private Integer id;
     private String description;
     private UsersDto users;
-    private CommentDto parentComment;
+    private List<CommentDto> parentComment;
 
 }
