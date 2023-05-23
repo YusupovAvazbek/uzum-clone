@@ -48,7 +48,6 @@ public class CartServiceImpl implements CartService {
 
             Cart cart = byId.get();
             cart.getProducts().add(byId1.get());
-            cart.setTotalPrice((int) (cart.getTotalPrice() + byId1.get().getPrice()));
             Cart save = cartRepository.save(cart);
             return ResponseDto.<CartDto>builder()
                     .code(AppStatusCodes.OK_CODE)

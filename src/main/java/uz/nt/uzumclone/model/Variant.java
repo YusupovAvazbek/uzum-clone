@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -19,4 +21,6 @@ public class Variant {
     private Integer variantId;
     @Column(name = "variant_name")
     private String variantName;
+    @OneToMany(mappedBy = "variant")
+    private List<VariantValue> variantValues;
 }

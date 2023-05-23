@@ -19,7 +19,6 @@ public class Product {
     @SequenceGenerator(name = "productIdSeq", sequenceName = "product_id_seq", allocationSize = 1)
     private Integer id;
     private String name;
-    private Double price;
     private Integer amount;
     private String description;
     @ManyToOne

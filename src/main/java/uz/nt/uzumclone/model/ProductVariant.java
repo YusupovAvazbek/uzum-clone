@@ -21,8 +21,14 @@ public class ProductVariant {
     @JoinColumn(name = "product_id")
     @ManyToOne
     private Product product;
+    private Double price;
     private String sku;
-    @OneToMany
+    @ManyToMany
+    @JoinTable(
+            name = "product_details",
+            joinColumns = @JoinColumn(name = "productVariant_id"),
+            inverseJoinColumns = @JoinColumn(name = "variantValue_id")
+    )
     private List<VariantValue> variantValues;
 
 }

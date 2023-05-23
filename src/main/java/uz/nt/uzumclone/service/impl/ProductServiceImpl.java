@@ -27,11 +27,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
-    private final BrandServices brandServices;
+    private final BrandServiceImpl brandServices;
 
     @Override
     public ResponseDto<ProductDto> addProduct(ProductDto productDto) {
-        Brand brand = brandServices.addBrand(productDto.getBrand());
+        Brand brand = brandServices.addBrand(productDto.getBrand().getName());
         Product product = productMapper.toEntity(productDto);
         product.setBrand(brand);
         try {
@@ -74,9 +74,7 @@ public class ProductServiceImpl implements ProductService {
         if (productDto.getName() != null) {
             product.setName(productDto.getName());
         }
-        if (productDto.getPrice() != null) {
-            product.setPrice(productDto.getPrice());
-        }
+
         if (productDto.getAmount() != null && productDto.getAmount() > 0) {
             product.setIsAvailable(true);
             product.setAmount(productDto.getAmount());
