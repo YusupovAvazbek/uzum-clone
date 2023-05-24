@@ -9,6 +9,8 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.service.Impl.ProductServiceImpl;
 import uz.nt.uzumclone.service.ProductService;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/product")
 @RequiredArgsConstructor
@@ -32,8 +34,12 @@ public class ProductResources {
         return productService.getAllProducts(page, size);
     }
 
-    @GetMapping("/by-id")
-    public ResponseDto<ProductDto> getProductById(@RequestParam Integer id){
+    @GetMapping("/{id}")
+    public ResponseDto<ProductDto> getProductById(@PathVariable Integer id){
         return productService.getProductById(id);
+    }
+    @GetMapping("/search")
+    public ResponseDto<Page<ProductDto>> search(@RequestParam Map<String, String> params){
+        return productService.universalSearch(params);
     }
 }

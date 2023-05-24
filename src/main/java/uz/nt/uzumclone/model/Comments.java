@@ -31,6 +31,6 @@ public class Comments {
     private Product product;
     @OneToMany
     @JoinColumn(name = "parent_comment_id")
-    private List<Category> parentComment;
+    private List<Comments> parentComment;
 
 }

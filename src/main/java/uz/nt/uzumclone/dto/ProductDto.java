@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.nt.uzumclone.model.Brand;
+import uz.nt.uzumclone.model.ProductVariant;
+
+import java.util.List;
 
 import static uz.nt.uzumclone.additional.AppStatusMessages.EMPTY_STRING;
 import static uz.nt.uzumclone.additional.AppStatusMessages.NEGATIVE_VALUE;
@@ -19,13 +22,11 @@ public class ProductDto {
     private Integer id;
     @NotBlank(message = EMPTY_STRING)
     private String name;
-    @Positive(message = NEGATIVE_VALUE)
-    private Double price;
     private Integer amount;
     @NotBlank(message = EMPTY_STRING)
     private String description;
-    @NotBlank(message = EMPTY_STRING)
     private BrandDto brand;
     private CategoryDto category;
+    private List<ProductVariantDto> productVariants;
     private Boolean isAvailable;
 }

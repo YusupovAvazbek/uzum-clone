@@ -18,11 +18,11 @@ public class ProductVariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    private Double price;
+    private String sku;
     @JoinColumn(name = "product_id")
     @ManyToOne
     private Product product;
-    private Double price;
-    private String sku;
     @ManyToMany
     @JoinTable(
             name = "product_details",
