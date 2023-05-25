@@ -6,129 +6,74 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import uz.nt.uzumclone.model.Category;
 import uz.nt.uzumclone.model.Product;
 
+import java.util.*;
 import java.util.Map;
 
-@Repository
+@Component
 @RequiredArgsConstructor
-public class ProductRepositoryImpl {
+public class ProductRepositoryImpl implements ProductCustomRepository {
     private final EntityManager entityManager;
+    @Override
+    public Page<Product> universalSearch(Map<String, String> params) {
+        return null;
+    }
 
-    public Page<Product> universalSearch(Map<String,String> params){
-        int page = 0, size = 10;
-        if(params.containsKey("page")){
-            page = Integer.parseInt(params.get("page"));
-        }
-        if(params.containsKey("size")){
-            size = Math.max(Integer.parseInt(params.get("size")),1);
-        }
+    @Override
+    public Page<Product> sort(String sorting) {
+        return null;
+    }
+    @Override
+    public Page<Product> getByCategory(Integer id, Integer currentPage) {
+        int size = 10;
+        int page = Math.max(currentPage,0);
 
-        String sqlQuery = "select p from Product p where 1 = 1 ";
-        String sqlCount = "select count(1) from Product p where 1 = 1 ";
+        List<Integer> categoryIds = getCategoriesWithChildren(id);
+        Query query = entityManager
+                .createQuery("SELECT p FROM Product p WHERE p.category.id IN :categoryIds", Product.class)
+                .setParameter("categoryIds", categoryIds);
 
-        StringBuilder queryCondition = new StringBuilder();
-        generateQueryCondition(queryCondition, params);
 
-        Query query = entityManager.createQuery(sqlQuery + queryCondition);
-        Query countQuery = entityManager.createQuery(sqlCount + queryCondition);
+        long count = (Long) entityManager.createQuery("SELECT count(p) FROM Product p WHERE p.category.id IN :categoryIds")
+                        .setParameter("categoryIds", categoryIds)
+                        .getSingleResult();
 
-        setParam(query, params);
-        setParam(countQuery, params);
-        long count = (long) countQuery.getSingleResult();
-
-        if(count > 0 && count/size <= page){
-            if(count % size == 0){
-                page = (int) count/size - 1;
-            }else {
-                page = (int) count/size;
+        if (count > 0 && count / size <= page) {
+            if (count % size == 0) {
+                page = (int) count / size - 1;
+            } else {
+                page = (int) count / size;
             }
         }
-
         query.setFirstResult(size * page);
         query.setMaxResults(size);
 
-        return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
-    }
-
-    public Page<Product> getByCategory(Integer id,Map<String, String> params){
-        int page = 0, size = 10;
-        if(params.containsKey("page")){
-            page = Integer.parseInt(params.get("page"));
-        }
-        if(params.containsKey("size")){
-            size = Math.max(Integer.parseInt(params.get("size")),1);
-        }
-        String sqlQuery = "select p from Product p where p.category.id = "+id;
-        String sqlCount = "select count(1) from Product p.category.id = "+id;
-        Query query = entityManager.createQuery(sqlQuery);
-        Query cntQuery = entityManager.createQuery(sqlCount);
-
-        long count = (long) cntQuery.getSingleResult();
-
-        query.setFirstResult(size * page);
-        query.setMaxResults(size);
 
         return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
 
     }
+    public List<Integer> getCategoriesWithChildren(Integer categoryId) {
+        List<Integer> categoryIds = entityManager.createNativeQuery(
+                        "WITH RECURSIVE child_categories AS (" +
+                                "  SELECT id " +
+                                "  FROM category " +
+                                "  WHERE id = :categoryId " +
+                                "  UNION ALL " +
+                                "  SELECT c.id " +
+                                "  FROM category c " +
+                                "  JOIN child_categories cc ON cc.id = c.parent_category_id" +
+                                ") " +
+                                "SELECT id " +
+                                "FROM child_categories"
+                )
+                .setParameter("categoryId", categoryId)
+                .getResultList();
 
-    public Page<Product> sort(String sorting, Integer page, Integer size){
-//        page = Math.max(0,page);
-//        size = Math.max(size,1);
-//
-//        String sqlQuery = "select p from Product p where  = "+id;
-//        String sqlCount = "select count(1) from Product p.category.id = "+id;
-//        Query query = entityManager.createQuery(sqlQuery);
-//        Query cntQuery = entityManager.createQuery(sqlCount);
-//
-//        long count = (long) cntQuery.getSingleResult();
-//
-//        query.setFirstResult(size * page);
-//        query.setMaxResults(size);
-
-//        return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
-    return null;
+        return categoryIds;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    private void generateQueryCondition(StringBuilder queryCondition , Map<String , String> params){
-        if(params.containsKey("name")){
-            queryCondition.append(" and upper(p.name) like :name ");
-        }
-        if(params.containsKey("amount")){
-            queryCondition.append(" AND p.amount = :amount ");
-        }
-        if(params.containsKey("description")){
-            queryCondition.append(" AND upper(p.description) like :description ");
-        }
-        if(params.containsKey("price")){
-            queryCondition.append(" AND p.price = :price ");
-        }
-    }
-    private void setParam(Query query , Map<String , String> params){
-        if(params.containsKey("name")){
-            query.setParameter("name","%"+params.get("name").toUpperCase()+"%");
-        }
-        if(params.containsKey("amount")){
-            query.setParameter("amount",Integer.parseInt(params.get("amount")));
-        }
-        if(params.containsKey("description")){
-            query.setParameter("description","%"+params.get("description").toUpperCase()+"%");
-        }
-        if(params.containsKey("price")){
-            query.setParameter("price",Integer.parseInt(params.get("price")));
-        }
-    }
 }

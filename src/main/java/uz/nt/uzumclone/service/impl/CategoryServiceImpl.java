@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-    private final ProductRepositoryImpl productRepositoryImpl;
+    private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
     @Override
@@ -50,8 +50,8 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    public ResponseDto<Page<ProductDto>> get(Integer id,Map<String, String> params) {
-        Page<Product> products = productRepositoryImpl.getByCategory(id,params);
+    public ResponseDto<Page<ProductDto>> get(Integer id,Integer currentPage) {
+        Page<Product> products = productRepository.getByCategory(id,currentPage);
         if(products.isEmpty()){
             return ResponseDto.<Page<ProductDto>>builder()
                     .code(NOT_FOUND_ERROR_CODE)
@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public ResponseDto<Page<ProductDto>> sort(String sorting, Integer page, Integer size) {
-        productRepositoryImpl.sort(sorting, page, size);
+        productRepository.sort(sorting);
         return null;
     }
 }

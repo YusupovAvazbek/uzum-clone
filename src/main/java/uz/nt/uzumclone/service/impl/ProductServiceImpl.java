@@ -30,7 +30,6 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
     private final BrandServiceImpl brandServices;
-    private final ProductRepositoryImpl productRepositoryImpl;
 
     @Override
     public ResponseDto<ProductDto> addProduct(ProductDto productDto) {
@@ -142,7 +141,7 @@ public class ProductServiceImpl implements ProductService {
                 );
     }
     public ResponseDto<Page<ProductDto>> universalSearch(Map<String, String> params) {
-        Page<Product> products = productRepositoryImpl.universalSearch(params);
+        Page<Product> products = productRepository.universalSearch(params);
         if(products.isEmpty()) {
             return ResponseDto.<Page<ProductDto>>builder()
                     .code(NOT_FOUND_ERROR_CODE)

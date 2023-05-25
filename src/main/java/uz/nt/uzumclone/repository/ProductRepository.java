@@ -7,5 +7,5 @@ import uz.nt.uzumclone.model.Product;
 import java.util.List;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Integer> {
+public interface ProductRepository extends JpaRepository<Product, Integer> , ProductCustomRepository{
 }

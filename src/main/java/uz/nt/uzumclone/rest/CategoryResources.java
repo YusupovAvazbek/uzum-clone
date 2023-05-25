@@ -18,8 +18,8 @@ public class CategoryResources {
 
     private final CategoryServiceImpl categoryService;
     @GetMapping("/{id}")
-    public ResponseDto<Page<ProductDto>> get(@PathVariable Integer id,@RequestParam Map<String, String> params){
-        return categoryService.get(id, params);
+    public ResponseDto<Page<ProductDto>> get(@PathVariable Integer id,@RequestParam(defaultValue = "1") Integer currentPage){
+        return categoryService.get(id, currentPage);
     }
     @PostMapping
     public ResponseDto<CategoryDto> addCategory(@RequestBody @Valid CategoryDto categoryDto){
