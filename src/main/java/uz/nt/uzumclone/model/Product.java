@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +19,6 @@ public class Product {
     @SequenceGenerator(name = "productIdSeq", sequenceName = "product_id_seq", allocationSize = 1)
     private Integer id;
     private String name;
-    private Double price;
     private Integer amount;
     private String description;
     @ManyToOne
@@ -25,5 +26,7 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
+    @OneToMany(mappedBy = "product")
+    private List<ProductVariant> productVariants;
     private Boolean isAvailable;
 }

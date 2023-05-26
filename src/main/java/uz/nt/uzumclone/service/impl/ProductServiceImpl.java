@@ -10,11 +10,13 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.repository.ProductRepository;
+import uz.nt.uzumclone.repository.ProductRepositoryImpl;
 import uz.nt.uzumclone.service.BrandServices;
 import uz.nt.uzumclone.service.ProductService;
 import uz.nt.uzumclone.service.mapper.CategoryMapper;
 import uz.nt.uzumclone.service.mapper.ProductMapper;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static uz.nt.uzumclone.additional.AppStatusCodes.*;
@@ -27,11 +29,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
-    private final BrandServices brandServices;
+    private final BrandServiceImpl brandServices;
 
     @Override
     public ResponseDto<ProductDto> addProduct(ProductDto productDto) {
-        Brand brand = brandServices.addBrand(productDto.getBrand());
+        Brand brand = brandServices.addBrand(productDto.getBrand().getName());
         Product product = productMapper.toEntity(productDto);
         product.setBrand(brand);
         try {
@@ -74,9 +76,7 @@ public class ProductServiceImpl implements ProductService {
         if (productDto.getName() != null) {
             product.setName(productDto.getName());
         }
-        if (productDto.getPrice() != null) {
-            product.setPrice(productDto.getPrice());
-        }
+
         if (productDto.getAmount() != null && productDto.getAmount() > 0) {
             product.setIsAvailable(true);
             product.setAmount(productDto.getAmount());
@@ -140,4 +140,20 @@ public class ProductServiceImpl implements ProductService {
                         .build()
                 );
     }
+    public ResponseDto<Page<ProductDto>> universalSearch(Map<String, String> params) {
+        Page<Product> products = productRepository.universalSearch(params);
+        if(products.isEmpty()) {
+            return ResponseDto.<Page<ProductDto>>builder()
+                    .code(NOT_FOUND_ERROR_CODE)
+                    .success(false)
+                    .message(NOT_FOUND)
+                    .build();
+        }
+            return ResponseDto.<Page<ProductDto>>builder()
+                    .code(OK_CODE)
+                    .message(OK)
+                    .success(true)
+                    .data(products.map(productMapper::toDto))
+                    .build();
+        }
 }

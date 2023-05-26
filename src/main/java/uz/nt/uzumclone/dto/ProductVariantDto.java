@@ -11,10 +11,10 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentDto {
+public class ProductVariantDto {
     private Integer id;
-    private String description;
-    private UsersDto users;
-    private List<CommentDto> parentComment;
-
+    private Double price;
+    private String sku;
+    private ProductDto product;
+    private List<VariantValueDto> variantValueIds;
 }
