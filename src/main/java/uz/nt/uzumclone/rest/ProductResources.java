@@ -39,7 +39,7 @@ public class ProductResources {
         return productService.getProductById(id);
     }
     @GetMapping("/search")
-    public ResponseDto<Page<ProductDto>> search(@RequestParam Map<String, String> params){
-        return productService.universalSearch(params);
+    public ResponseDto<Page<ProductDto>> search(@RequestParam String query, @RequestParam Integer currentPage){
+        return productService.universalSearch(query, currentPage);
     }
 }
