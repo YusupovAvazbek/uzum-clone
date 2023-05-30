@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,6 +24,8 @@ public class Product {
     private String name;
     private Integer amount;
     private String description;
+    private Integer price;
+    private Integer discount;
     @ManyToOne
     private Category category;
     @ManyToOne
@@ -29,4 +34,7 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<ProductVariant> productVariants;
     private Boolean isAvailable;
+    @CreatedDate
+    @CreationTimestamp
+    private LocalDateTime date;
 }

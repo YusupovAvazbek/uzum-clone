@@ -19,7 +19,8 @@ public class CommentResources {
         return commentService.viewAll(id);
     }
     @PostMapping("/{id}")
-    public ResponseDto<CommentDto> writeComment(@RequestParam String comment,@PathVariable Integer id){
+    public ResponseDto<CommentDto> writeComment(@RequestParam String comment,
+                                                @PathVariable Integer id){
         return commentService.addComment(id, comment);
     }
 

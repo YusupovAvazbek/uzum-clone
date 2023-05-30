@@ -140,8 +140,8 @@ public class ProductServiceImpl implements ProductService {
                         .build()
                 );
     }
-    public ResponseDto<Page<ProductDto>> universalSearch(Map<String, String> params) {
-        Page<Product> products = productRepository.universalSearch(params);
+    public ResponseDto<Page<ProductDto>> universalSearch(String query, Integer currentPage) {
+        Page<Product> products = productRepository.universalSearch(query,currentPage);
         if(products.isEmpty()) {
             return ResponseDto.<Page<ProductDto>>builder()
                     .code(NOT_FOUND_ERROR_CODE)
