@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,6 +16,7 @@ import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Category;
 import uz.nt.uzumclone.model.Product;
+import uz.nt.uzumclone.rest.CategoryResources;
 import uz.nt.uzumclone.rest.ProductResources;
 
 import java.util.*;
@@ -29,21 +31,37 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
     private final EntityManager entityManager;
 
     @Override
-    public Page<Product> universalSearch(String query, Integer currentPage) {
-        int size = 10;
+    public Page<Product> universalSearch(String query, String sorting, String ordering, Integer size, Integer currentPage) {
+        size = Math.max(size, 0);
         int page = Math.max(currentPage,0);
-        TypedQuery<Product> search = entityManager.createQuery("SELECT p FROM Product p WHERE LOWER(p.name) LIKE :query OR LOWER(p.category.name) LIKE :query OR LOWER(p.description) LIKE :query", Product.class);
-        search.setParameter("query", "%" + query.toLowerCase() + "%");
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Product> criteriaQuery = criteriaBuilder.createQuery(Product.class);
+        Root<Product> root = criteriaQuery.from(Product.class);
+        criteriaQuery.select(root);
+
+        Predicate namePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + query.toLowerCase() + "%");
+        Predicate categoryPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("category").get("name")), "%" + query.toLowerCase() + "%");
+        Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + query.toLowerCase() + "%");
+        Predicate finalPredicate = criteriaBuilder.or(namePredicate, categoryPredicate, descriptionPredicate);
+
+        criteriaQuery.where(finalPredicate);
+
 
         TypedQuery<Category> customQuery = entityManager.createQuery("select c from Category c where LOWER( c.name ) LIKE :query", Category.class);
                 customQuery.setParameter("query","%"+query.toLowerCase()+"%");
-
-        if(search.getResultList().isEmpty()){
-            if(!customQuery.getResultList().isEmpty()){
-                return getByCategory(customQuery.getResultList().get(0).getId(),page);
+        if (sorting != null && ordering != null) {
+            Path<Object> sortPath;
+            if (ordering.equalsIgnoreCase("ascending")) {
+                sortPath = root.get(sorting);
+                criteriaQuery.orderBy(criteriaBuilder.asc(sortPath));
+            } else if (ordering.equalsIgnoreCase("descending")) {
+                sortPath = root.get(sorting);
+                criteriaQuery.orderBy(criteriaBuilder.desc(sortPath));
             }
         }
 
+        TypedQuery<Product> search = entityManager.createQuery(criteriaQuery);
 
         long count = search.getResultList().size();
 
@@ -57,6 +75,13 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
         }
         search.setFirstResult(size * page);
         search.setMaxResults(size);
+
+        if(search.getResultList().isEmpty()){
+            if(!customQuery.getResultList().isEmpty()){
+                return sort(customQuery.getResultList().get(0).getId(),sorting,ordering,currentPage);
+            }
+        }
+
 
         return new PageImpl<>(search.getResultList(),PageRequest.of(page,size),count);
 
@@ -77,7 +102,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
         criteriaQuery.where(root.get("category").get("id").in(categoryIds));
 
         if(sorting != null && ordering != null){
-            Path<Object> sortPath = root.get(ordering);
+            Path<Object> sortPath = root.get(sorting);
             Order order = ordering.equalsIgnoreCase("ascending") ? criteriaBuilder.asc(sortPath) : criteriaBuilder.desc(sortPath);
             criteriaQuery.orderBy(order);
         }
@@ -124,14 +149,14 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
         }
         query.setFirstResult(size * page);
         query.setMaxResults(size);
-//        EntityModel entityModel = EntityModel.of(query.getResultList());
-//        entityModel.add(linkTo(ProductResources.class
-//                .getDeclaredMethod()))
 
         return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
 
     }
-    public Page<Product> getProductByBrand(Integer id, List<String> brands){
+    @Override
+    public Page<Product> getProductByBrand(Integer id, List<String> brands, Integer currentPage){
+        int size = 10;
+        int page = Math.max(currentPage,0);
         List<Integer> categoryIds = getCategoriesWithChildren(id);
 
         Query query = entityManager
@@ -139,8 +164,19 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
                 .setParameter("categoryIds", categoryIds)
                 .setParameter("brandNames",brands);
 
-        return null;
+        long count = query.getResultList().stream().count();
 
+        if (count > 0 && count / size <= page) {
+            if (count % size == 0) {
+                page = (int) count / size - 1;
+            } else {
+                page = (int) count / size;
+            }
+        }
+        query.setFirstResult(size * page);
+        query.setMaxResults(size);
+
+        return new PageImpl<>(query.getResultList(), PageRequest.of(page,size), count);
     }
     private List<Integer> getCategoriesWithChildren(Integer categoryId) {
 

@@ -29,8 +29,8 @@ public class ProductResources {
     }
 
     @GetMapping
-    public ResponseDto<Page<ProductDto>> getAllProducts(@RequestParam(defaultValue = "10") Integer size,
-                                                        @RequestParam(defaultValue = "0") Integer page){
+    public ResponseDto<Page<ProductDto>> getAllProducts(@RequestParam(defaultValue = "10",required = false) Integer size,
+                                                        @RequestParam(defaultValue = "0",required = false) Integer page){
         return productService.getAllProducts(page, size);
     }
 
@@ -38,9 +38,5 @@ public class ProductResources {
     public ResponseDto<ProductDto> getProductById(@PathVariable Integer id){
         return productService.getProductById(id);
     }
-    @GetMapping("/search")
-    public ResponseDto<Page<ProductDto>> search(@RequestParam String query,
-                                                @RequestParam Integer currentPage){
-        return productService.universalSearch(query, currentPage);
-    }
+
 }

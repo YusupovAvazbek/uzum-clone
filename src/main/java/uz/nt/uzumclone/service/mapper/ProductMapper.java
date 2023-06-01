@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import uz.nt.uzumclone.dto.ProductDto;
+import uz.nt.uzumclone.dto.ProductVariantDto;
 import uz.nt.uzumclone.model.Product;
 
 @Mapper(componentModel = "spring")

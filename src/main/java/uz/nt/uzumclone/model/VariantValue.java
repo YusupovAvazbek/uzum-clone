@@ -14,7 +14,7 @@ public class VariantValue {
     @Column(name = "value_id")
     private Integer valueId;
     private String value;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id")
     private Variant variant;
 }

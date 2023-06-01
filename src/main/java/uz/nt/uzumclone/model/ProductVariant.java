@@ -21,8 +21,10 @@ public class ProductVariant {
     private Double price;
     private String sku;
     @JoinColumn(name = "product_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
+    @OneToMany
+    private List<Image> images;
     @ManyToMany
     @JoinTable(
             name = "product_details",

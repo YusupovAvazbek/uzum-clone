@@ -3,16 +3,19 @@ package uz.nt.uzumclone.service.Impl;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import uz.nt.uzumclone.dto.BrandDto;
 import uz.nt.uzumclone.dto.CategoryDto;
 import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
+import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.repository.CategoryRepository;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.ProductRepositoryImpl;
 import uz.nt.uzumclone.service.CategoryService;
+import uz.nt.uzumclone.service.mapper.BrandMapper;
 import uz.nt.uzumclone.service.mapper.CategoryMapper;
 import uz.nt.uzumclone.service.mapper.ProductMapper;
 
@@ -33,6 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final BrandMapper brandMapper;
 
     @Override
     public ResponseDto<CategoryDto> addCategory(CategoryDto categoryDto) {
@@ -55,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
     @Override
-    public ResponseDto<Page<ProductDto>> get(Integer id,Integer currentPage) {
+    public ResponseDto<Page<ProductDto>> get(Integer id, Integer currentPage) {
         Page<Product> products = productRepository.getByCategory(id,currentPage);
         if(products.isEmpty()){
             return ResponseDto.<Page<ProductDto>>builder()
@@ -68,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .code(OK_CODE)
                 .message(OK)
                 .success(true)
-                .data(products.map(productMapper::toDto))
+                .data(products.map(product -> productMapper.toDto(product)))
                 .build();
     }
 
@@ -107,7 +111,11 @@ public class CategoryServiceImpl implements CategoryService {
                 .build();
     }
 
-    public ResponseDto<Page<ProductDto>> getByBrand(Integer id, List<String> filter) {
-        return null;
+    public ResponseDto<Page<ProductDto>> getByBrand(Integer id, List<String> filter, Integer currentPage) {
+        Page<Product> productByBrand = productRepository.getProductByBrand(id, filter, currentPage);
+
+        return ResponseDto.<Page<ProductDto>>builder()
+                .data(productByBrand.map(product -> productMapper.toDto(product)))
+                .build();
     }
 }

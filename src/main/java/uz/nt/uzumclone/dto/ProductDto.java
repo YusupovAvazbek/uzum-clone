@@ -1,11 +1,15 @@
 package uz.nt.uzumclone.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uz.nt.uzumclone.additional.AppStatusMessages;
 import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.ProductVariant;
 
@@ -23,6 +27,7 @@ public class ProductDto {
     @NotBlank(message = EMPTY_STRING)
     private String name;
     private Integer amount;
+    private Integer price;
     @NotBlank(message = EMPTY_STRING)
     private String description;
     private BrandDto brand;
