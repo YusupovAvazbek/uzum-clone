@@ -19,7 +19,8 @@ public class CartResources {
         return cartService.getUserCart(id);
     }
     @PostMapping
-    public ResponseDto<CartDto> addToCart(@RequestParam Integer cartId, @RequestParam Integer productId){
+    public ResponseDto<CartDto> addToCart(@RequestParam Integer cartId,
+                                          @RequestParam Integer productId){
         return cartService.addToCart(cartId, productId);
     }
 }

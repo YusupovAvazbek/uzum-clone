@@ -5,6 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,13 +22,19 @@ public class Product {
     @SequenceGenerator(name = "productIdSeq", sequenceName = "product_id_seq", allocationSize = 1)
     private Integer id;
     private String name;
-    private Double price;
     private Integer amount;
     private String description;
+    private Integer price;
+    private Integer discount;
     @ManyToOne
     private Category category;
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> productVariants;
     private Boolean isAvailable;
+    @CreatedDate
+    @CreationTimestamp
+    private LocalDateTime date;
 }

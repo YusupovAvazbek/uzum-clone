@@ -6,15 +6,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import uz.nt.uzumclone.dto.BrandDto;
 import uz.nt.uzumclone.dto.ProductDto;
+import uz.nt.uzumclone.dto.ProductVariantDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Product;
+import uz.nt.uzumclone.model.ProductVariant;
 import uz.nt.uzumclone.repository.ProductRepository;
+import uz.nt.uzumclone.repository.ProductRepositoryImpl;
+import uz.nt.uzumclone.repository.ProductVariantRepository;
 import uz.nt.uzumclone.service.BrandServices;
 import uz.nt.uzumclone.service.ProductService;
 import uz.nt.uzumclone.service.mapper.CategoryMapper;
 import uz.nt.uzumclone.service.mapper.ProductMapper;
+import uz.nt.uzumclone.service.mapper.ProductVariantMapper;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static uz.nt.uzumclone.additional.AppStatusCodes.*;
@@ -27,19 +34,21 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
-    private final BrandServices brandServices;
+    private final BrandServiceImpl brandServices;
+    private final ProductVariantMapper productVariantMapper;
+    private final ProductVariantRepository productVariantRepository;
 
     @Override
     public ResponseDto<ProductDto> addProduct(ProductDto productDto) {
-        Brand brand = brandServices.addBrand(productDto.getBrand());
+        Brand brand = brandServices.addBrand(productDto.getBrand().getName());
         Product product = productMapper.toEntity(productDto);
         product.setBrand(brand);
         try {
-            productRepository.save(product);
+            Product save = productRepository.save(product);
 
             return ResponseDto.<ProductDto>builder()
                     .success(true)
-                    .data(productMapper.toDto(product))
+                    .data(productMapper.toDto(save))
                     .message("OK")
                     .build();
         } catch (Exception e) {
@@ -74,9 +83,7 @@ public class ProductServiceImpl implements ProductService {
         if (productDto.getName() != null) {
             product.setName(productDto.getName());
         }
-        if (productDto.getPrice() != null) {
-            product.setPrice(productDto.getPrice());
-        }
+
         if (productDto.getAmount() != null && productDto.getAmount() > 0) {
             product.setIsAvailable(true);
             product.setAmount(productDto.getAmount());
@@ -140,4 +147,20 @@ public class ProductServiceImpl implements ProductService {
                         .build()
                 );
     }
+    public ResponseDto<Page<ProductDto>> universalSearch(String query, String sorting, String ordering, Integer size, Integer currentPage) {
+        Page<Product> products = productRepository.universalSearch(query,sorting, ordering, size, currentPage);
+        if(products.isEmpty()) {
+            return ResponseDto.<Page<ProductDto>>builder()
+                    .code(NOT_FOUND_ERROR_CODE)
+                    .success(false)
+                    .message(NOT_FOUND)
+                    .build();
+        }
+            return ResponseDto.<Page<ProductDto>>builder()
+                    .code(OK_CODE)
+                    .message(OK)
+                    .success(true)
+                    .data(products.map(productMapper::toDto))
+                    .build();
+        }
 }

@@ -24,8 +24,11 @@ public class BrandServiceImpl implements BrandServices {
 
     @Override
     public Brand addBrand(String name) {
-        return brandRepository.addIfNewBrand(name)
-                .orElseThrow(() -> new DatabaseException("Could not save brand to database!"));
+        Brand brand = new Brand();
+        brand.setName(name);
+        return brandRepository.save(brand);
+//        return brandRepository.addIfNewBrand(name)
+//                .orElseThrow(() -> new DatabaseException("Could not save brand to database!"));
     }
 
     @Override
