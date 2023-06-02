@@ -22,7 +22,7 @@ public class CartResources {
 
     @Operation(
             method = "Get Cart User",
-            description = "You can get cart of user, send user's ID to this method",
+            description = "You can get cart of user, send User ID to this method",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Data about User cart",
                     content = @Content(mediaType = "application/json")),
             responses = {@ApiResponse(responseCode = "-2", description = VALIDATION_ERROR),
@@ -39,6 +39,20 @@ public class CartResources {
         return cartService.getUserCart(id);
     }
 
+    @Operation(
+            method = "Add to Cart",
+            description = "You can add product to cart. Send cart ID and product ID to do this.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Product added to cart",
+                    content = @Content(mediaType = "application/json")),
+            responses = {@ApiResponse(responseCode = "-2", description = VALIDATION_ERROR),
+                    @ApiResponse(responseCode = "-1", description = NOT_FOUND),
+                    @ApiResponse(responseCode = "0", description = OK),
+                    @ApiResponse(responseCode = "1", description = DATABASE_ERROR),
+                    @ApiResponse(responseCode = "2", description = UNEXPECTED_ERROR)
+            },
+            summary = "Add product to cart"
+
+    )
     @PostMapping
     public ResponseDto<CartDto> addToCart(@RequestParam Integer cartId, @RequestParam Integer productId) {
         return cartService.addToCart(cartId, productId);
