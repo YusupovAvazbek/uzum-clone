@@ -36,10 +36,6 @@ public class ProductResources {
                                                         @RequestParam(defaultValue = "0",required = false) Integer page){
         return productService.getAllProducts(page, size);
     }
-    @GetMapping("/pro")
-    public ResponseEntity<List<ProductProjection>> go(@RequestParam Integer userId){
-        return productService.go(userId);
-    }
 
     @GetMapping("/{id}")
     public ResponseDto<ProductDto> getProductById(@PathVariable Integer id){
