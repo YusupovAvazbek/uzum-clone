@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import uz.nt.uzumclone.dto.ProductDto;
@@ -22,8 +21,6 @@ import uz.nt.uzumclone.rest.ProductResources;
 import java.util.*;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
 @RequiredArgsConstructor
@@ -78,7 +75,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
         if(search.getResultList().isEmpty()){
             if(!customQuery.getResultList().isEmpty()){
-                return sort(customQuery.getResultList().get(0).getId(),sorting,ordering,currentPage);
+                return getWithSort(customQuery.getResultList().get(0).getId(),sorting,ordering,currentPage);
             }
         }
 
@@ -88,7 +85,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
     }
 
     @Override
-    public Page<Product> sort(Integer id, String sorting, String ordering, Integer currentPage) {
+    public Page<Product> getWithSort(Integer id, String sorting, String ordering, Integer currentPage) {
         int size = 10;
         int page = Math.max(currentPage,0);
 
@@ -124,35 +121,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
     }
 
-    @Override
-    public Page<Product> getByCategory(Integer id, Integer currentPage) {
-        int size = 10;
-        int page = Math.max(currentPage,0);
 
-        List<Integer> categoryIds = getCategoriesWithChildren(id);
-
-        Query query = entityManager
-                .createQuery("SELECT p FROM Product p WHERE p.category.id IN :categoryIds", Product.class)
-                .setParameter("categoryIds", categoryIds);
-
-
-        long count = (Long) entityManager.createQuery("SELECT count(p) FROM Product p WHERE p.category.id IN :categoryIds")
-                        .setParameter("categoryIds", categoryIds)
-                        .getSingleResult();
-
-        if (count > 0 && count / size <= page) {
-            if (count % size == 0) {
-                page = (int) count / size - 1;
-            } else {
-                page = (int) count / size;
-            }
-        }
-        query.setFirstResult(size * page);
-        query.setMaxResults(size);
-
-        return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
-
-    }
     @Override
     public Page<Product> getProductByBrand(Integer id, List<String> brands, Integer currentPage){
         int size = 10;
