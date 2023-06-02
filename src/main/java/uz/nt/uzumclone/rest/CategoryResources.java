@@ -35,15 +35,6 @@ public class CategoryResources {
     public ResponseDto<CategoryDto> addCategory(@RequestBody @Valid CategoryDto categoryDto){
         return categoryService.addCategory(categoryDto);
     }
-
-//    @GetMapping("/sort/{id}")
-//    public ResponseDto<Page<ProductDto>> sort(  @PathVariable Integer id,
-//                                                @RequestParam(required = false) String sorting,
-//                                                @RequestParam(required = false) String ordering,
-//                                                @RequestParam(required = false, defaultValue = "10") Integer size,
-//                                                @RequestParam(required = false, defaultValue = "0") Integer currentPage){
-//        return  categoryService.sort(id,sorting,ordering,currentPage);
-//    }
     @GetMapping("/{id}/brand")
     public ResponseDto<Page<ProductDto>> byBrand(@PathVariable Integer id,
                                                  @RequestParam List<String> filter,
