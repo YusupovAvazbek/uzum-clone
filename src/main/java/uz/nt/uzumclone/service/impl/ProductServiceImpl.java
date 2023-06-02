@@ -3,6 +3,7 @@ package uz.nt.uzumclone.service.Impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.nt.uzumclone.dto.BrandDto;
 import uz.nt.uzumclone.dto.ProductDto;
@@ -11,6 +12,7 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.model.ProductVariant;
+import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.ProductRepositoryImpl;
 import uz.nt.uzumclone.repository.ProductVariantRepository;
@@ -163,4 +165,8 @@ public class ProductServiceImpl implements ProductService {
                     .data(products.map(productMapper::toDto))
                     .build();
         }
+
+    public ResponseEntity<List<ProductProjection>> go(Integer userId) {
+        return ResponseEntity.ok(productRepository.getProducts(userId,1,1));
+    }
 }

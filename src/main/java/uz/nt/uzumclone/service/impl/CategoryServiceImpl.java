@@ -58,27 +58,10 @@ public class CategoryServiceImpl implements CategoryService {
                     .build();
         }
     }
-    @Override
-    public ResponseDto<Page<ProductDto>> get(Integer id, Integer currentPage) {
-        Page<Product> products = productRepository.getByCategory(id,currentPage);
-        if(products.isEmpty()){
-            return ResponseDto.<Page<ProductDto>>builder()
-                    .code(NOT_FOUND_ERROR_CODE)
-                    .success(false)
-                    .message(NOT_FOUND)
-                    .build();
-        }
-        return ResponseDto.<Page<ProductDto>>builder()
-                .code(OK_CODE)
-                .message(OK)
-                .success(true)
-                .data(products.map(product -> productMapper.toDto(product)))
-                .build();
-    }
 
     @Override
-    public ResponseDto<Page<ProductDto>> sort(Integer id, String sorting, String ordering, Integer currentPage) {
-        Page<Product> sort = productRepository.sort(id, sorting, ordering, currentPage);
+    public ResponseDto<Page<ProductDto>> getWithSort(Integer id, String sorting, String ordering, Integer currentPage) {
+        Page<Product> sort = productRepository.getWithSort(id, sorting, ordering, currentPage);
         if(sort.isEmpty()){
             return ResponseDto.<Page<ProductDto>>builder()
                     .build();
@@ -91,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public ResponseDto<Set<BrandDto>> brandByCategory(Integer categoryId){
-        ResponseDto<Page<ProductDto>> pageResponseDto = get(categoryId, 0);
+        ResponseDto<Page<ProductDto>> pageResponseDto = getWithSort(categoryId,null,null,0);
         Page<ProductDto> data = pageResponseDto.getData();
         if(!data.isEmpty()) {
 
