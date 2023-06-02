@@ -3,7 +3,6 @@ package uz.nt.uzumclone.service.Impl;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import uz.nt.uzumclone.dto.BrandDto;
 import uz.nt.uzumclone.dto.CategoryDto;

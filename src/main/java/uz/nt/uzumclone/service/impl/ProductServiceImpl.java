@@ -12,7 +12,6 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.model.ProductVariant;
-import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.ProductRepositoryImpl;
 import uz.nt.uzumclone.repository.ProductVariantRepository;
@@ -166,7 +165,4 @@ public class ProductServiceImpl implements ProductService {
                     .build();
         }
 
-    public ResponseEntity<List<ProductProjection>> go(Integer userId) {
-        return ResponseEntity.ok(productRepository.getProducts(userId,1,1));
-    }
 }
