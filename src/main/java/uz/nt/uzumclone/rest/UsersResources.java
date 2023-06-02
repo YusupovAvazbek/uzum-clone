@@ -31,5 +31,10 @@ public class UsersResources {
     public ResponseDto<UsersDto> getById(@PathVariable Integer id){
         return usersService.getById(id);
     }
+    @PostMapping("/like")
+    public ResponseDto<Boolean> like(@RequestParam Integer userId,
+                                  @RequestParam Integer productId){
+        return usersService.like(userId,productId);
+    }
 
 }

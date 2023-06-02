@@ -10,6 +10,5 @@ import uz.nt.uzumclone.model.Product;
 
 public interface CategoryService {
     ResponseDto<CategoryDto> addCategory(CategoryDto categoryDto);
-    ResponseDto<Page<ProductDto>> get(Integer id, Integer currentPage);
-    ResponseDto<Page<ProductDto>> sort(Integer id, String sorting, String ordering, Integer currentPage);
+    ResponseDto<Page<ProductDto>> getWithSort(Integer id, String sorting, String ordering, Integer currentPage);
 }

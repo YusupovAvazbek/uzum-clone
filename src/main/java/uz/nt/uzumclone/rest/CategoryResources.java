@@ -29,7 +29,7 @@ public class CategoryResources {
                                              @RequestParam(required = false) String ordering,
                                              @RequestParam(required = false,defaultValue = "10") Integer size,
                                              @RequestParam(required = false, defaultValue = "0") Integer currentPage){
-        return categoryService.sort(id, sorting,ordering,currentPage);
+        return categoryService.getWithSort(id, sorting,ordering,currentPage);
     }
     @PostMapping
     public ResponseDto<CategoryDto> addCategory(@RequestBody @Valid CategoryDto categoryDto){

@@ -11,4 +11,6 @@ public interface UsersService {
     ResponseDto<UsersDto> getUserByPhoneNumber(String phoneNumber);
     ResponseDto<UsersDto> getById(Integer id);
     ResponseDto<UsersDto> deleteUser(Integer id);
+
+    ResponseDto<Boolean> like(Integer userId, Integer productId);
 }

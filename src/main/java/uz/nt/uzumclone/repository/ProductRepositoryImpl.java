@@ -2,20 +2,26 @@ package uz.nt.uzumclone.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.transform.AliasToBeanResultTransformer;
+import org.hibernate.transform.ResultTransformer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Category;
 import uz.nt.uzumclone.model.Product;
+import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.rest.CategoryResources;
 import uz.nt.uzumclone.rest.ProductResources;
 
@@ -27,6 +33,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ProductRepositoryImpl implements ProductCustomRepository {
     private final EntityManager entityManager;
 
@@ -78,7 +85,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
         if(search.getResultList().isEmpty()){
             if(!customQuery.getResultList().isEmpty()){
-                return sort(customQuery.getResultList().get(0).getId(),sorting,ordering,currentPage);
+                return getWithSort(customQuery.getResultList().get(0).getId(),sorting,ordering,currentPage);
             }
         }
 
@@ -88,7 +95,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
     }
 
     @Override
-    public Page<Product> sort(Integer id, String sorting, String ordering, Integer currentPage) {
+    public Page<Product> getWithSort(Integer id, String sorting, String ordering, Integer currentPage) {
         int size = 10;
         int page = Math.max(currentPage,0);
 
@@ -125,35 +132,6 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
     }
 
     @Override
-    public Page<Product> getByCategory(Integer id, Integer currentPage) {
-        int size = 10;
-        int page = Math.max(currentPage,0);
-
-        List<Integer> categoryIds = getCategoriesWithChildren(id);
-
-        Query query = entityManager
-                .createQuery("SELECT p FROM Product p WHERE p.category.id IN :categoryIds", Product.class)
-                .setParameter("categoryIds", categoryIds);
-
-
-        long count = (Long) entityManager.createQuery("SELECT count(p) FROM Product p WHERE p.category.id IN :categoryIds")
-                        .setParameter("categoryIds", categoryIds)
-                        .getSingleResult();
-
-        if (count > 0 && count / size <= page) {
-            if (count % size == 0) {
-                page = (int) count / size - 1;
-            } else {
-                page = (int) count / size;
-            }
-        }
-        query.setFirstResult(size * page);
-        query.setMaxResults(size);
-
-        return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
-
-    }
-    @Override
     public Page<Product> getProductByBrand(Integer id, List<String> brands, Integer currentPage){
         int size = 10;
         int page = Math.max(currentPage,0);
@@ -178,6 +156,47 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
         return new PageImpl<>(query.getResultList(), PageRequest.of(page,size), count);
     }
+
+    @Override
+    public boolean like(Integer userId, Integer productId) {
+        Query query = entityManager.createNativeQuery("INSERT INTO liked_products(user_id, product_id) VALUES (:uId, :pId)")
+                .setParameter("uId", userId)
+                .setParameter("pId", productId);
+
+        try {
+            int i = query.executeUpdate();
+            return i > 0;
+        } catch (Exception e) {
+            log.error("error during insert liked_product table {}",e.getMessage());
+            return false;
+        }
+
+    }
+
+    @Override
+    public List<ProductProjection> getProducts(Integer userId, Integer currentPage, Integer size) {
+        List<Object[]> results = entityManager.createNativeQuery(
+                "SELECT p.id AS id," +
+                        "       p.name AS name," +
+                        "       p.description AS description," +
+                        "       p.price AS price," +
+                        "       p.category_id AS categoryId," +
+                        "       p.brand_id AS brandId," +
+                        "       p.discount AS discount," +
+                        "CASE WHEN lp.user_id IS NOT NULL THEN true ELSE false END AS liked " +
+                        "FROM product p " +
+                        "LEFT JOIN liked_products lp ON p.id = lp.product_id AND lp.user_id = :id"
+         ).setParameter("id",userId).getResultList();
+        List<ProductProjection> projections = new ArrayList<>();
+        ResultTransformer transformer = new AliasToBeanResultTransformer(ProductProjection.class);
+
+        for (Object[] result : results) {
+            projections.add((ProductProjection) transformer.transformTuple(result, null));
+        }
+
+        return projections;
+    }
+
     private List<Integer> getCategoriesWithChildren(Integer categoryId) {
 
         List<Integer> categoryIds = entityManager.createNativeQuery(
