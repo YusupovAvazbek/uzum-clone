@@ -10,6 +10,7 @@ import uz.nt.uzumclone.dto.CategoryDto;
 import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Product;
+import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.service.Impl.CategoryServiceImpl;
 
 import java.util.Map;
@@ -24,11 +25,11 @@ public class CategoryResources {
 
     private final CategoryServiceImpl categoryService;
     @GetMapping("/{id}")
-    public ResponseDto<Page<ProductDto>> get(@PathVariable Integer id,
-                                             @RequestParam(required = false) String sorting,
-                                             @RequestParam(required = false) String ordering,
-                                             @RequestParam(required = false,defaultValue = "10") Integer size,
-                                             @RequestParam(required = false, defaultValue = "0") Integer currentPage){
+    public ResponseDto<Page<ProductProjection>> get(@PathVariable Integer id,
+                                                    @RequestParam(required = false) String sorting,
+                                                    @RequestParam(required = false) String ordering,
+                                                    @RequestParam(required = false,defaultValue = "10") Integer size,
+                                                    @RequestParam(required = false, defaultValue = "0") Integer currentPage){
         return categoryService.getWithSort(id, sorting,ordering,currentPage);
     }
     @PostMapping

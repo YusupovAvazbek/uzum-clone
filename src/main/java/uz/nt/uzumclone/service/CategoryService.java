@@ -1,14 +1,11 @@
 package uz.nt.uzumclone.service;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.domain.Page;
-import org.springframework.hateoas.EntityModel;
 import uz.nt.uzumclone.dto.CategoryDto;
-import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
-import uz.nt.uzumclone.model.Product;
+import uz.nt.uzumclone.projections.ProductProjection;
 
 public interface CategoryService {
     ResponseDto<CategoryDto> addCategory(CategoryDto categoryDto);
-    ResponseDto<Page<ProductDto>> getWithSort(Integer id, String sorting, String ordering, Integer currentPage);
+    ResponseDto<Page<ProductProjection>> getWithSort(Integer id, String sorting, String ordering, Integer currentPage);
 }

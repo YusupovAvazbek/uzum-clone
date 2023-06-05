@@ -87,7 +87,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
         if(search.getResultList().isEmpty()){
             if(!customQuery.getResultList().isEmpty()){
-                return getWithSort(customQuery.getResultList().get(0).getId(),sorting,ordering,currentPage);
+                return null;//getWithSort(customQuery.getResultList().get(0).getId(),sorting,ordering,currentPage);
             }
         }
 
@@ -97,28 +97,95 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
     }
 
     @Override
-    public Page<Product> getWithSort(Integer id, String sorting, String ordering, Integer currentPage) {
+    public Page<ProductProjection> getWithSort(Integer cid, String sorting, String ordering, Integer currentPage) {
         int size = 10;
         int page = Math.max(currentPage,0);
 
-        List<Integer> categoryIds = getCategoriesWithChildren(id);
 
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery(Product.class);
-        Root<Product> root = criteriaQuery.from(Product.class);
-        criteriaQuery.select(root);
+        List<Integer> categoryIds = getCategoriesWithChildren(cid);
 
-        criteriaQuery.where(root.get("category").get("id").in(categoryIds));
+        String nativeQuery = "SELECT p.id AS id,p.name AS name,p.description AS description,p.price AS price," +
+                "p.category_id AS categoryId,p.brand_id AS brandId,p.discount AS discount," +
+                "CASE WHEN lp.user_id IS NOT NULL THEN true ELSE false END AS liked " +
+                "FROM product p " +
+                "LEFT JOIN liked_products lp ON p.id = lp.product_id AND lp.user_id = 2 " +
+                "where p.category_id in :categoryIds ";
 
-        if(sorting != null && ordering != null){
-            Path<Object> sortPath = root.get(sorting);
-            Order order = ordering.equalsIgnoreCase("ascending") ? criteriaBuilder.asc(sortPath) : criteriaBuilder.desc(sortPath);
-            criteriaQuery.orderBy(order);
+        if (sorting != null && ordering != null) {
+            nativeQuery += " ORDER BY ";
+            switch (sorting) {
+                case "name":
+                    nativeQuery += "name ";
+                    break;
+                case "price":
+                    nativeQuery += "price ";
+                    break;
+            }
+
+            if (ordering.equalsIgnoreCase("descending")) {
+                nativeQuery += "DESC";
+            } else {
+                nativeQuery += "ASC";
+            }
         }
 
-        TypedQuery<Product> query = entityManager.createQuery(criteriaQuery);
+        Query query = entityManager.createNativeQuery(nativeQuery, Object[].class);
+        query.setParameter("categoryIds", categoryIds);
 
-        long count = query.getResultList().size();
+        List<Object[]> resultList = query.getResultList();
+
+
+        List<ProductProjection> productProjections = new ArrayList<>();
+        for (Object[] result : resultList) {
+            Integer id = (Integer) result[0];
+            String name = (String) result[1];
+            String description = (String) result[2];
+            Integer price = (Integer) result[3];
+            Integer categoryId = (Integer) result[4];
+            Integer brandId = (Integer) result[5];
+            Integer discount = (Integer) result[6];
+            boolean liked = (boolean) result[7];
+
+            ProductProjection productProjection = new ProductProjection() {
+                @Override
+                public Integer getId() {
+                    return id;
+                }
+                @Override
+                public String getName() {
+                    return name;
+                }
+                @Override
+                public String getDescription() {
+                    return description;
+                }
+                @Override
+                public Integer getPrice() {
+                    return price;
+                }
+                @Override
+                public Integer getCategoryId() {
+                    return categoryId;
+                }
+                @Override
+                public Integer getBrandId() {
+                    return brandId;
+                }
+                @Override
+                public Integer getDiscount() {
+                    return discount;
+                }
+                @Override
+                public boolean isLiked() {
+                    return liked;
+                }
+            };
+
+            productProjections.add(productProjection);
+        }
+
+
+        long count = productProjections.size();
         if (count > 0 && count / size <= page) {
             if (count % size == 0) {
                 page = (int) count / size - 1;
@@ -129,7 +196,8 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
         query.setFirstResult(page * size);
         query.setMaxResults(size);
 
-        return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
+
+        return new PageImpl<>(productProjections, PageRequest.of(page, size), count);
 
     }
 
