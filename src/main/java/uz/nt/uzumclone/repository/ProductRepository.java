@@ -35,7 +35,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> , Pro
             "LEFT JOIN liked_products lp ON p.id = lp.product_id AND lp.user_id = :userId ", nativeQuery = true)
     List<ProductProjection> getLikedProductUsingNativeQueryWithProjectionWithoutPagination(Integer userId);
 
-    @Query(value = "SELECT p, case when u is not null then true else false end as liked " +
+    @Query(value = "SELECT p.id as id, p.name as name, p.description as description, p.price as price, p.category.id as categoryId, p.brand.id as brandId, p.discount as discount, case when u is not null then true else false end as liked " +
 //            "CASE WHEN lp.user_id IS NOT NULL THEN true ELSE false END AS liked " +
             "FROM Product p " +
             "JOIN FETCH p.favourited u where u.id = :userId")
