@@ -187,6 +187,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ResponseDto<List<ProductProjection>> getProductsWithNativeQuery(Integer userId) {
+        try {
+            List<ProductProjection> products = productRepository.getLikedProductUsingNativeQueryWithProjectionWithoutPagination(userId);
+            return ResponseDto.<List<ProductProjection>>builder()
+                    .success(true)
+                    .code(OK_CODE)
+                    .message(OK)
+                    .data(products)
+                    .build();
+        } catch (Exception e) {
+            return ResponseDto.<List<ProductProjection>>builder()
+                    .success(false)
+                    .code(OK_CODE)
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
     public ResponseDto<List<ProductProjection>> getViewedProduct(Integer userId) {
         try {
             List<ProductProjection> productViewed = productRepository.getProductViewed(userId);

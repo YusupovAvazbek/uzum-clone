@@ -40,6 +40,10 @@ public class ProductResources {
     public ResponseDto<List<ProductProjection>> getProducts(@RequestParam Integer userId){
         return productService.getProducts(userId);
     }
+    @GetMapping("with-native")
+    public ResponseDto<List<ProductProjection>> getProductsWithNative(@RequestParam Integer userId){
+        return productService.getProductsWithNativeQuery(userId);
+    }
     @GetMapping("/{id}")
     public ResponseDto<ProductDto> getProductById(@PathVariable Integer id){
         return productService.getProductById(id);
