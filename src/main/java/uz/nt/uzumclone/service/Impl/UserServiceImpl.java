@@ -159,19 +159,4 @@ public class UserServiceImpl implements UsersService {
         }
     }
 
-    @Override
-    public ResponseDto<Boolean> like(Integer userId, Integer productId) {
-        boolean like = productRepository.like(userId, productId);
-        if(like){
-            return ResponseDto.<Boolean>builder()
-                    .message(OK)
-                    .success(true)
-                    .build();
-        }else{
-            return ResponseDto.<Boolean>builder()
-                    .message(OK)
-                    .success(false)
-                    .build();
-        }
-    }
 }

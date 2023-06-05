@@ -31,15 +31,22 @@ public class ProductResources {
         return productService.updateProduct(productDto);
     }
 
+//    @GetMapping
+//    public ResponseDto<Page<ProductDto>> getAllProducts(@RequestParam(defaultValue = "10",required = false) Integer size,
+//                                                        @RequestParam(defaultValue = "0",required = false) Integer page){
+//        return productService.getAllProducts(page, size);
+//    }
     @GetMapping
-    public ResponseDto<Page<ProductDto>> getAllProducts(@RequestParam(defaultValue = "10",required = false) Integer size,
-                                                        @RequestParam(defaultValue = "0",required = false) Integer page){
-        return productService.getAllProducts(page, size);
+    public ResponseDto<List<ProductProjection>> getProducts(@RequestParam Integer userId){
+        return productService.getProducts(userId);
     }
-
     @GetMapping("/{id}")
     public ResponseDto<ProductDto> getProductById(@PathVariable Integer id){
         return productService.getProductById(id);
+    }
+    @GetMapping("viewed")
+    public ResponseDto<List<ProductProjection>> getViewedProduct(@RequestParam Integer userId){
+        return productService.getViewedProduct(userId);
     }
 
 }

@@ -38,6 +38,13 @@ public class Users {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<Product> favorited = new HashSet<>();
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "viewed_products",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private Set<Product> viewed = new HashSet<>();
     @CreatedDate
     @CreationTimestamp
     private LocalDateTime createdAt;

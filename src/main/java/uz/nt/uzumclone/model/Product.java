@@ -39,6 +39,8 @@ public class Product {
     private List<ProductVariant> productVariants;
     @ManyToMany(mappedBy = "favorited")
     private Set<Users> favourited = new HashSet<>();
+    @ManyToMany(mappedBy = "viewed")
+    private Set<Users> viewed = new HashSet<>();
     private Boolean isAvailable;
     @CreatedDate
     @CreationTimestamp
