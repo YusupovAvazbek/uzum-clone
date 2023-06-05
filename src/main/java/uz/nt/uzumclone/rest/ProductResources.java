@@ -44,6 +44,11 @@ public class ProductResources {
     public ResponseDto<List<ProductProjection>> getProductsWithNative(@RequestParam Integer userId){
         return productService.getProductsWithNativeQuery(userId);
     }
+
+    @GetMapping("with-jpql")
+    public ResponseDto<List<ProductProjection>> getProductsWithJPQL(@RequestParam Integer userId){
+        return productService.getProductsWithJPQL(userId);
+    }
     @GetMapping("/{id}")
     public ResponseDto<ProductDto> getProductById(@PathVariable Integer id){
         return productService.getProductById(id);

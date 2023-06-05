@@ -16,5 +16,7 @@ public interface ProductService {
     ResponseDto<List<ProductProjection>> getProducts(Integer userId);
     ResponseDto<List<ProductProjection>> getProductsWithNativeQuery(Integer userId);
 
+    ResponseDto<List<ProductProjection>> getProductsWithJPQL(Integer userId);
+
     ResponseDto<List<ProductProjection>> getViewedProduct(Integer userId);
 }
