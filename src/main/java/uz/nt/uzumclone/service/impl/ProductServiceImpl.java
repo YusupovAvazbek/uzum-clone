@@ -1,5 +1,8 @@
 package uz.nt.uzumclone.service.Impl;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.transaction.Transactional;
+import jakarta.validation.OverridesAttribute;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +15,7 @@ import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.model.ProductVariant;
+import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.ProductRepositoryImpl;
 import uz.nt.uzumclone.repository.ProductVariantRepository;
@@ -134,35 +138,86 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ResponseDto<ProductDto> getProductById(Integer id) {
-        return productRepository.findById(id)
-                .map(products -> ResponseDto.<ProductDto>builder()
-                        .data(productMapper.toDto(products))
+        Integer userId = 1;
+        try {
+            Optional<Product> byId = productRepository.findById(id);
+            if (!byId.isEmpty()) {
+                productRepository.insertViewedProduct(userId, id);
+                return ResponseDto.<ProductDto>builder()
+                        .data(productMapper.toDto(byId.get()))
                         .success(true)
                         .code(OK_CODE)
                         .message(OK)
-                        .build())
-                .orElse(ResponseDto.<ProductDto>builder()
-                        .message(NOT_FOUND)
-                        .code(NOT_FOUND_ERROR_CODE)
-                        .build()
-                );
+                        .build();
+            }
+            return ResponseDto.<ProductDto>builder()
+                    .message(NOT_FOUND)
+                    .code(NOT_FOUND_ERROR_CODE)
+                    .build();
+
+        } catch (Exception e) {
+            return ResponseDto.<ProductDto>builder()
+                    .message(DATABASE_ERROR)
+                    .code(DATABASE_ERROR_CODE)
+                    .build();
+        }
+
+
     }
+
+    @Override
+    public ResponseDto<List<ProductProjection>> getProducts(Integer userId) {
+        try {
+            List<ProductProjection> products = productRepository.getProducts(userId, null, null);
+            return ResponseDto.<List<ProductProjection>>builder()
+                    .success(true)
+                    .code(OK_CODE)
+                    .message(OK)
+                    .data(products)
+                    .build();
+        } catch (Exception e) {
+            return ResponseDto.<List<ProductProjection>>builder()
+                    .success(false)
+                    .code(OK_CODE)
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
+    public ResponseDto<List<ProductProjection>> getViewedProduct(Integer userId) {
+        try {
+            List<ProductProjection> productViewed = productRepository.getProductViewed(userId);
+            return ResponseDto.<List<ProductProjection>>builder()
+                    .message(OK)
+                    .code(OK_CODE)
+                    .data(productViewed)
+                    .build();
+        } catch (Exception e) {
+            return ResponseDto.<List<ProductProjection>>builder()
+                    .message(DATABASE_ERROR + ":" + e.getMessage())
+                    .success(true)
+                    .code(DATABASE_ERROR_CODE)
+                    .build();
+        }
+    }
+
     public ResponseDto<Page<ProductDto>> universalSearch(String query, String sorting, String ordering, Integer size, Integer currentPage) {
-        Page<Product> products = productRepository.universalSearch(query,sorting, ordering, size, currentPage);
-        if(products.isEmpty()) {
+        Page<Product> products = productRepository.universalSearch(query, sorting, ordering, size, currentPage);
+        if (products.isEmpty()) {
             return ResponseDto.<Page<ProductDto>>builder()
                     .code(NOT_FOUND_ERROR_CODE)
                     .success(false)
                     .message(NOT_FOUND)
                     .build();
         }
-            return ResponseDto.<Page<ProductDto>>builder()
-                    .code(OK_CODE)
-                    .message(OK)
-                    .success(true)
-                    .data(products.map(productMapper::toDto))
-                    .build();
-        }
-
+        return ResponseDto.<Page<ProductDto>>builder()
+                .code(OK_CODE)
+                .message(OK)
+                .success(true)
+                .data(products.map(productMapper::toDto))
+                .build();
+    }
 }

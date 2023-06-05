@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UsersDto;
 import uz.nt.uzumclone.model.Users;
+import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.UsersRepository;
 import uz.nt.uzumclone.service.CartService;
 import uz.nt.uzumclone.service.UsersService;
@@ -20,6 +21,7 @@ public class UserServiceImpl implements UsersService {
     private final UsersMapper userMapper;
     private final UsersRepository usersRepository;
     private final CartService cartService;
+    private final ProductRepository productRepository;
     @Override
     public ResponseDto<UsersDto> addUser(UsersDto dto) {
         try {
@@ -156,4 +158,5 @@ public class UserServiceImpl implements UsersService {
                     .build();
         }
     }
+
 }

@@ -57,7 +57,6 @@ public class CategoryServiceImpl implements CategoryService {
                     .build();
         }
     }
-
     @Override
     public ResponseDto<Page<ProductDto>> getWithSort(Integer id, String sorting, String ordering, Integer currentPage) {
         Page<Product> sort = productRepository.getWithSort(id, sorting, ordering, currentPage);
@@ -73,7 +72,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public ResponseDto<Set<BrandDto>> brandByCategory(Integer categoryId){
-        ResponseDto<Page<ProductDto>> pageResponseDto = getWithSort(categoryId,null,null,0);
+
+        ResponseDto<Page<ProductDto>> pageResponseDto = getWithSort(categoryId, null,null,0);
+
         Page<ProductDto> data = pageResponseDto.getData();
         if(!data.isEmpty()) {
 
