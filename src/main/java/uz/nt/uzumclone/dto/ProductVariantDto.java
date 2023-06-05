@@ -15,6 +15,6 @@ public class ProductVariantDto {
     private Integer id;
     private Double price;
     private String sku;
-    private ProductDto product;
+    //private ProductDto product;
     private List<VariantValueDto> variantValueIds;
 }
