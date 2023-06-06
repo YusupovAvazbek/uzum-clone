@@ -10,6 +10,7 @@ import uz.nt.uzumclone.dto.CategoryDto;
 import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Product;
+import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.service.Impl.CategoryServiceImpl;
 
 import java.util.Map;
@@ -25,21 +26,16 @@ public class CategoryResources {
     private final CategoryServiceImpl categoryService;
     @GetMapping("/{id}")
     public ResponseDto<Page<ProductDto>> get(@PathVariable Integer id,
-                                             @RequestParam(required = false) String sorting,
-                                             @RequestParam(required = false) String ordering,
-                                             @RequestParam(required = false,defaultValue = "10") Integer size,
-                                             @RequestParam(required = false, defaultValue = "0") Integer currentPage){
-        return categoryService.getWithSort(id, sorting,ordering,currentPage);
+                                                    @RequestParam(required = false) String sorting,
+                                                    @RequestParam(required = false) String ordering,
+                                                    @RequestParam(required = false) List<String> filter,
+                                                    @RequestParam(required = false,defaultValue = "10") Integer size,
+                                                    @RequestParam(required = false, defaultValue = "0") Integer currentPage){
+        return categoryService.getWithSort(id, filter,sorting,ordering,currentPage);
     }
     @PostMapping
     public ResponseDto<CategoryDto> addCategory(@RequestBody @Valid CategoryDto categoryDto){
         return categoryService.addCategory(categoryDto);
-    }
-    @GetMapping("/{id}/brand")
-    public ResponseDto<Page<ProductDto>> byBrand(@PathVariable Integer id,
-                                                 @RequestParam List<String> filter,
-                                                 @RequestParam(required = false) Integer currentPage) {
-        return categoryService.getByBrand(id,filter,currentPage);
     }
     @GetMapping("/{id}/brands")
     public ResponseDto<Set<BrandDto>> brands(@PathVariable Integer id){

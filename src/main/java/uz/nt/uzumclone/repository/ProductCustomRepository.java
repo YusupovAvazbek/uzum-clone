@@ -12,11 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductCustomRepository {
-    Page<Product> universalSearch(String query, String sorting, String ordering, Integer size, Integer currentPage);
-    Page<Product> getWithSort(Integer id, String sorting, String ordering, Integer currentPage);
-    Page<Product> getProductByBrand(Integer id, List<String> brands, Integer currentPage);
-    List<ProductProjection> getProducts(Integer userId, Integer currentPage, Integer size);
-    List<ProductProjection> getProductViewed(Integer userId);
+    Page<Product> universalSearch(String query, List<String> filter,String sorting, String ordering, Integer size, Integer currentPage);
+    Page<Product> getWithSort(Integer id, List<String> filter,String sorting, String ordering, Integer currentPage);
     boolean insertViewedProduct(Integer userId, Integer productId);
 
 }

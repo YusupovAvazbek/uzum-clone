@@ -117,27 +117,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseDto<Page<ProductDto>> getAllProducts(Integer page, Integer size) {
-        Long count = productRepository.count();
-
-        PageRequest pageRequest = PageRequest.of(
-                (count / size) <= page ?
-                        (count % size == 0 ? (int) (count / size) - 1
-                                : (int) (count / size))
-                        : page,
-                size);
-
-        Page<ProductDto> products = productRepository.findAll(pageRequest)
-                .map(productMapper::toDto);
-
-        return ResponseDto.<Page<ProductDto>>builder()
-                .message(OK)
-                .success(true)
-                .data(products)
-                .build();
-    }
-
-    @Override
     @Transactional
     public ResponseDto<ProductDto> getProductById(Integer id) {
         Integer userId = 1;
@@ -168,9 +147,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseDto<List<ProductProjection>> getProducts(Integer userId) {
+    public ResponseDto<List<ProductProjection>> getProducts(Integer userId,Integer currentPage, Integer size) {
         try {
-            List<ProductProjection> products = productRepository.getProducts(userId, null, null);
+            List<ProductProjection> products = productRepository.getProducts(userId,currentPage,size);
             return ResponseDto.<List<ProductProjection>>builder()
                     .success(true)
                     .code(OK_CODE)
@@ -189,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseDto<List<ProductProjection>> getViewedProduct(Integer userId) {
         try {
-            List<ProductProjection> productViewed = productRepository.getProductViewed(userId);
+            List<ProductProjection> productViewed = productRepository.getViewedProducts(userId);
             return ResponseDto.<List<ProductProjection>>builder()
                     .message(OK)
                     .code(OK_CODE)
@@ -204,9 +183,9 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    public ResponseDto<Page<ProductDto>> universalSearch(String query, String sorting, String ordering, Integer size, Integer currentPage) {
-        Page<Product> products = productRepository.universalSearch(query, sorting, ordering, size, currentPage);
-        if (products.isEmpty()) {
+    public ResponseDto<Page<ProductDto>> universalSearch(String query, List<String> filter,String sorting, String ordering, Integer size, Integer currentPage) {
+        Page<Product> products = productRepository.universalSearch(query,filter,sorting, ordering, size, currentPage);
+        if(products.isEmpty()) {
             return ResponseDto.<Page<ProductDto>>builder()
                     .code(NOT_FOUND_ERROR_CODE)
                     .success(false)
