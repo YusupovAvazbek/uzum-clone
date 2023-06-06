@@ -13,15 +13,16 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String path;
+    private String pathLarge;
+    private String pathMedium;
+    private String pathSmall;
     private String ext;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ProductDetails productDetails;
     @CreatedDate
     @CreationTimestamp
     private LocalDateTime createdAt;

@@ -14,17 +14,18 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "product_variant")
-public class ProductVariant {
+public class ProductDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Double price;
-    private String sku;
-    @JoinColumn(name = "product_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Product product;
-    @OneToMany(mappedBy = "productVariant",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ProductDetails> productDetails = new ArrayList<>();
+    private ProductVariant productVariant;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private VariantValue variantValue;
+    @OneToMany(mappedBy = "productDetails",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
+    public ProductDetails(Integer id){
+        this.id = id;
+    }
 }

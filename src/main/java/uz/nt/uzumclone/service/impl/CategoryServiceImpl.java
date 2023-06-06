@@ -54,27 +54,29 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
     @Override
-    public ResponseDto<Page<ProductProjection>> getWithSort(Integer id, String sorting, String ordering, Integer currentPage) {
-        Page<ProductProjection> sort = productRepository.getWithSort(id, sorting, ordering, currentPage);
+    public ResponseDto<Page<ProductDto>> getWithSort(Integer id, List<String> filter, String sorting, String ordering, Integer currentPage) {
+        Page<Product> sort = productRepository.getWithSort(id,filter, sorting, ordering, currentPage);
         if(sort.isEmpty()){
-            return ResponseDto.<Page<ProductProjection>>builder()
+            return ResponseDto.<Page<ProductDto>>builder()
+                    .message(EMPTY_STRING)
+                    .code(OK_CODE)
+                    .success(true)
                     .build();
         }
-        return ResponseDto.<Page<ProductProjection>>builder()
-                .data(sort)
+        return ResponseDto.<Page<ProductDto>>builder()
+                .data(sort.map(pr->productMapper.toDto(pr)))
                 .code(OK_CODE)
                 .message(OK)
                 .build();
     }
 
     public ResponseDto<Set<BrandDto>> brandByCategory(Integer categoryId){
-        ResponseDto<Page<ProductProjection>> pageResponseDto = getWithSort(categoryId, null,null,0);
-        Page<ProductProjection> data = pageResponseDto.getData();
+        ResponseDto<Page<ProductDto>> pageResponseDto = getWithSort(categoryId, null,null,null,0);
+        Page<ProductDto> data = pageResponseDto.getData();
         if(!data.isEmpty()) {
-
             Set<BrandDto> collect = data.getContent()
                     .stream()
-                    .map(p -> new BrandDto())
+                    .map(p -> p.getBrand())
                     .collect(Collectors.toSet());
             return ResponseDto.<Set<BrandDto>>builder()
                     .data(collect)
@@ -85,14 +87,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return ResponseDto.<Set<BrandDto>>builder()
                 .message(EMPTY_STRING)
-                .build();
-    }
-
-    public ResponseDto<Page<ProductDto>> getByBrand(Integer id, List<String> filter, Integer currentPage) {
-        Page<Product> productByBrand = productRepository.getProductByBrand(id, filter, currentPage);
-
-        return ResponseDto.<Page<ProductDto>>builder()
-                .data(productByBrand.map(product -> productMapper.toDto(product)))
                 .build();
     }
 }
