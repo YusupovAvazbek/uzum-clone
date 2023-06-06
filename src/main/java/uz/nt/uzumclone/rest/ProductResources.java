@@ -30,15 +30,11 @@ public class ProductResources {
     public ResponseDto<ProductDto> updateProduct(@RequestBody ProductDto productDto){
         return productService.updateProduct(productDto);
     }
-
-//    @GetMapping
-//    public ResponseDto<Page<ProductDto>> getAllProducts(@RequestParam(defaultValue = "10",required = false) Integer size,
-//                                                        @RequestParam(defaultValue = "0",required = false) Integer page){
-//        return productService.getAllProducts(page, size);
-//    }
     @GetMapping
-    public ResponseDto<List<ProductProjection>> getProducts(@RequestParam Integer userId){
-        return productService.getProducts(userId);
+    public ResponseDto<List<ProductProjection>> getProducts(@RequestParam Integer userId,
+                                                            @RequestParam(required = false) Integer currentPage,
+                                                            @RequestParam(required = false) Integer size){
+        return productService.getProducts(userId,currentPage,size);
     }
     @GetMapping("/{id}")
     public ResponseDto<ProductDto> getProductById(@PathVariable Integer id){
