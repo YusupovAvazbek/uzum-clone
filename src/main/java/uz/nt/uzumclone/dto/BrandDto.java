@@ -23,11 +23,11 @@ public class BrandDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BrandDto brandDto = (BrandDto) o;
-        return Objects.equals(id, brandDto.id) && Objects.equals(name, brandDto.name) && Objects.equals(createdAt, brandDto.createdAt);
+        return Objects.equals(name, brandDto.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, createdAt);
+        return Objects.hash(name);
     }
 }

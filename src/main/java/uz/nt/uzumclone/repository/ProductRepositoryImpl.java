@@ -18,13 +18,20 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import uz.nt.uzumclone.dto.BrandDto;
+import uz.nt.uzumclone.dto.CommonDto;
 import uz.nt.uzumclone.dto.ProductDto;
 import uz.nt.uzumclone.dto.ResponseDto;
+import uz.nt.uzumclone.model.Brand;
 import uz.nt.uzumclone.model.Category;
+import uz.nt.uzumclone.model.Color;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.rest.CategoryResources;
 import uz.nt.uzumclone.rest.ProductResources;
+import uz.nt.uzumclone.service.mapper.BrandMapper;
+import uz.nt.uzumclone.service.mapper.CategoryMapper;
+import uz.nt.uzumclone.service.mapper.ProductMapper;
 
 import java.util.*;
 import java.util.Map;
@@ -38,6 +45,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @Slf4j
 public class ProductRepositoryImpl implements ProductCustomRepository {
     private final EntityManager entityManager;
+    private final ProductMapper productMapper;
+    private final BrandMapper brandMapper;
+    private final CategoryMapper categoryMapper;
 
     @Override
     public Page<Product> universalSearch(String query, List<String> filter,String sorting, String ordering, Integer size, Integer currentPage) {
@@ -94,7 +104,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
         if(search.getResultList().isEmpty()){
             if(!customQuery.getResultList().isEmpty()){
-                return getWithSort(customQuery.getResultList().get(0).getId(),filter,sorting,ordering,currentPage);
+                return null;//getWithSort(customQuery.getResultList().get(0).getId(),filter,sorting,ordering,currentPage);
             }
         }
 
@@ -104,7 +114,7 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
     }
 
     @Override
-    public Page<Product> getWithSort(Integer cid,List<String> filter, String sorting, String ordering, Integer currentPage) {
+    public CommonDto getWithSort(Integer cid, List<String> filter, String sorting, String ordering, Integer currentPage) {
         int size = 10;
         int page = Math.max(currentPage,0);
 
@@ -141,9 +151,17 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
         }
         query.setFirstResult(page * size);
         query.setMaxResults(size);
+        CommonDto response = new CommonDto();
 
-        return new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
 
+        PageImpl<Product> products = new PageImpl<>(query.getResultList(), PageRequest.of(page, size), count);
+        response.setProducts(products.map(pr->productMapper.toDto(pr)));
+        Set<BrandDto> brands = query.getResultList().stream().map(pr -> brandMapper.toDto(pr.getBrand())).collect(Collectors.toSet());
+        response.setBrands(brands);
+
+        response.setCategories(getCategory(cid).stream().map(category -> categoryMapper.toDto(category)).toList());
+
+        return response;
     }
 
     @Override
@@ -162,6 +180,16 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
         }
     }
 
+    @Override
+    public List<Category> getCategory(Integer id) {
+        List<Integer> categoriesId = getCategoriesWithChildrenAndParents(id);
+        TypedQuery<Category> query = entityManager.createQuery("select c from Category c where c.id in :category", Category.class)
+                .setParameter("category",categoriesId);
+
+
+        List<Category> categories = query.getResultList();
+        return categories;
+    }
     private List<Integer> getCategoriesWithChildren(Integer categoryId) {
 
         List<Integer> categoryIds = entityManager.createNativeQuery(
@@ -182,9 +210,26 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
         return categoryIds;
     }
+    private List<Integer> getCategoriesWithChildrenAndParents(Integer categoryId) {
+        List<Integer> categoryIds = entityManager.createNativeQuery(
+                        "WITH RECURSIVE parent_categories AS (\n" +
+                                "  SELECT id, name, parent_category_id\n" +
+                                "  FROM category\n" +
+                                "  WHERE id=:categoryId\n" +
+                                "  UNION\n" +
+                                "  SELECT c.id, c.name, c.parent_category_id\n" +
+                                "  FROM category c\n" +
+                                "  INNER JOIN parent_categories pc ON c.id = pc.parent_category_id \n" +
+                                ")\n" +
+                                "SELECT id\n" +
+                                "FROM parent_categories "
+                )
+                .setParameter("categoryId", categoryId)
+                .getResultList();
 
 
-
+        return categoryIds;
+    }
 //    public List<Integer> getCategoriesWithChildren(Integer categoryId) {
 //        List<Integer> categoryIds = new ArrayList<>();
 //        getCategoriesRecursive(categoryId, categoryIds);

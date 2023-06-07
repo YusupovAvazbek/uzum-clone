@@ -1,12 +1,11 @@
 package uz.nt.uzumclone.service.Impl;
 
+import jakarta.validation.OverridesAttribute;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import uz.nt.uzumclone.dto.BrandDto;
-import uz.nt.uzumclone.dto.CategoryDto;
-import uz.nt.uzumclone.dto.ProductDto;
-import uz.nt.uzumclone.dto.ResponseDto;
+import uz.nt.uzumclone.dto.*;
+import uz.nt.uzumclone.model.Category;
 import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.repository.CategoryRepository;
 import uz.nt.uzumclone.repository.ProductRepository;
@@ -53,40 +52,27 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
     @Override
-    public ResponseDto<Page<ProductDto>> getWithSort(Integer id, List<String> filter, String sorting, String ordering, Integer currentPage) {
-        Page<Product> sort = productRepository.getWithSort(id,filter, sorting, ordering, currentPage);
-        if(sort.isEmpty()){
-            return ResponseDto.<Page<ProductDto>>builder()
+    public ResponseDto<CommonDto> getWithSort(Integer id, List<String> filter, String sorting, String ordering, Integer currentPage) {
+        CommonDto sort = productRepository.getWithSort(id,filter, sorting, ordering, currentPage);
+        if(sort == null){
+            return ResponseDto.<CommonDto>builder()
                     .message(EMPTY_STRING)
                     .code(OK_CODE)
                     .success(true)
                     .build();
         }
-        return ResponseDto.<Page<ProductDto>>builder()
-                .data(sort.map(pr->productMapper.toDto(pr)))
+        return ResponseDto.<CommonDto>builder()
+                .data(sort)
                 .code(OK_CODE)
                 .message(OK)
                 .build();
     }
 
-    public ResponseDto<Set<BrandDto>> brandByCategory(Integer categoryId){
 
-        ResponseDto<Page<ProductDto>> pageResponseDto = getWithSort(categoryId, null,null,null,0);
-        Page<ProductDto> data = pageResponseDto.getData();
-        if(!data.isEmpty()) {
-            Set<BrandDto> collect = data.getContent()
-                    .stream()
-                    .map(p -> p.getBrand())
-                    .collect(Collectors.toSet());
-            return ResponseDto.<Set<BrandDto>>builder()
-                    .data(collect)
-                    .message(OK)
-                    .code(OK_CODE)
-                    .success(true)
-                    .build();
-        }
-        return ResponseDto.<Set<BrandDto>>builder()
-                .message(EMPTY_STRING)
+    public ResponseDto<List<CategoryDto>> category(Integer id) {
+        List<Category> category = productRepository.getCategory(id);
+        return ResponseDto.<List<CategoryDto>>builder()
+                .data(category.stream().map(c->categoryMapper.toDto(c)).toList())
                 .build();
     }
 }
