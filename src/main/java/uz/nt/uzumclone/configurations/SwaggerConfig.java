@@ -1,4 +1,4 @@
-package uz.nt.uzumclone.config;
+package uz.nt.uzumclone.configurations;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;

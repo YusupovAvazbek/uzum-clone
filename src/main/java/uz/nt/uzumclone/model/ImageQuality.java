@@ -9,12 +9,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
-public class Image {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ImageQuality {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -22,12 +23,10 @@ public class Image {
     private String pathMedium;
     private String pathSmall;
     private String ext;
+    private String quality;
     @ManyToOne(fetch = FetchType.LAZY)
-    private ProductDetails productDetails;
-    @OneToMany(mappedBy = "image")
-    private List<ImageQuality> imageQuality;
+    private Image image;
     @CreatedDate
     @CreationTimestamp
     private LocalDateTime createdAt;
-
 }

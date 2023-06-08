@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 public class UploadImageDto {
     private Integer ProductDetailId;
+    private String quality;
     private MultipartFile image;
 
 }
