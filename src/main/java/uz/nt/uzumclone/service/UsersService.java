@@ -1,6 +1,7 @@
 package uz.nt.uzumclone.service;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
+import uz.nt.uzumclone.dto.LoginDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UsersDto;
 
@@ -15,4 +16,6 @@ public interface UsersService extends UserDetailsService {
     ResponseDto<UsersDto> getById(Integer id);
 
     ResponseDto<UsersDto> deleteUser(Integer id);
+
+    ResponseDto<String> login(LoginDto loginDto);
 }

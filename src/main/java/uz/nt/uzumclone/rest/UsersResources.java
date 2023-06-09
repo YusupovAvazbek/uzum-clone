@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import uz.nt.uzumclone.dto.LoginDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UsersDto;
 import uz.nt.uzumclone.service.UsersService;
@@ -105,6 +106,11 @@ public class UsersResources {
     @GetMapping("/{id}")
     public ResponseDto<UsersDto> getById(@PathVariable Integer id){
         return usersService.getById(id);
+    }
+
+    @PostMapping("sign-in")
+    public ResponseDto<String> login(@RequestBody LoginDto loginDto){
+        return usersService.login(loginDto);
     }
 
 }

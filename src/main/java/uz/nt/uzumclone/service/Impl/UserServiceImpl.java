@@ -3,12 +3,17 @@ package uz.nt.uzumclone.service.Impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import uz.nt.uzumclone.additional.AppStatusCodes;
+import uz.nt.uzumclone.additional.AppStatusMessages;
+import uz.nt.uzumclone.dto.LoginDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UsersDto;
 import uz.nt.uzumclone.model.Users;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.UsersRepository;
+import uz.nt.uzumclone.security.JwtService;
 import uz.nt.uzumclone.service.CartService;
 import uz.nt.uzumclone.service.UsersService;
 import uz.nt.uzumclone.service.mapper.UsersMapper;
@@ -25,6 +30,9 @@ public class UserServiceImpl implements UsersService {
     private final UsersRepository usersRepository;
     private final CartService cartService;
     private final ProductRepository productRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
 
     @Override
     public ResponseDto<UsersDto> addUser(UsersDto dto) {
@@ -165,7 +173,24 @@ public class UserServiceImpl implements UsersService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public ResponseDto<String> login(LoginDto loginDto) {
+        UsersDto users = loadUserByUsername(loginDto.getUsername());
+        if (!passwordEncoder.matches(loginDto.getPassword(), users.getPassword())){
+            return ResponseDto.<String>builder()
+                    .message("Password is not correct")
+                    .code(AppStatusCodes.VALIDATION_ERROR_CODE)
+                    .build();
+        }
+
+        return ResponseDto.<String>builder()
+                .success(true)
+                .message(AppStatusMessages.OK)
+                .data(jwtService.generateToken(users))
+                .build();
+    }
+
+    @Override
+    public UsersDto loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Users> users = usersRepository.findFirstByEmail(username);
         if (users.isEmpty()) throw new UsernameNotFoundException("User with email " + username + " is not found");
 
