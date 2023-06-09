@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import uz.nt.uzumclone.additional.AppStatusCodes;
 import uz.nt.uzumclone.additional.AppStatusMessages;
 import uz.nt.uzumclone.dto.CategoryDto;
+import uz.nt.uzumclone.dto.CommonDto;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.model.Category;
 import uz.nt.uzumclone.repository.CategoryRepository;
@@ -19,6 +20,9 @@ import uz.nt.uzumclone.service.mapper.ProductMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CategoryServiceImplTest {
 
@@ -70,6 +74,37 @@ public class CategoryServiceImplTest {
 //        assertEquals(AppStatusMessages.DATABASE_ERROR, response.getMessage());
         assertEquals(AppStatusCodes.DATABASE_ERROR_CODE, response.getCode());
     }
+    @Test
+    void getWithSort_ShouldReturnResponseWithData() {
+        Integer id = 1;
+        List<String> filter = new ArrayList<>();
+        String sorting = "price";
+        String ordering = "ascending";
+        Integer currentPage = 1;
+        CommonDto sort = new CommonDto();
+        when(productRepository.getWithSort(id, filter, sorting, ordering, currentPage)).thenReturn(sort);
 
+        ResponseDto<CommonDto> response = categoryService.getWithSort(id, filter, sorting, ordering, currentPage);
+
+        assertEquals(sort, response.getData());
+        assertEquals(AppStatusMessages.OK, response.getMessage());
+        assertEquals(AppStatusCodes.OK_CODE, response.getCode());
+        assertEquals(true, response.isSuccess());
+    }
+
+    @Test
+    void category_ShouldReturnResponseWithData() {
+
+        Integer id = 1;
+        Category category = new Category();
+        List<Category> categoryList = new ArrayList<>();
+        categoryList.add(category);
+        when(productRepository.getCategory(id)).thenReturn(categoryList);
+        when(categoryMapper.toDto(category)).thenReturn(new CategoryDto());
+
+        ResponseDto<List<CategoryDto>> response = categoryService.category(id);
+
+        assertEquals(1, response.getData().size());
+    }
 
 }
