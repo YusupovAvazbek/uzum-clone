@@ -7,7 +7,9 @@ import uz.nt.uzumclone.additional.AppStatusMessages;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UploadImageDto;
 import uz.nt.uzumclone.model.Image;
+import uz.nt.uzumclone.model.ImageQuality;
 import uz.nt.uzumclone.model.ProductDetails;
+import uz.nt.uzumclone.repository.ImageQualityRepository;
 import uz.nt.uzumclone.repository.ImageRepository;
 import uz.nt.uzumclone.service.ImageService;
 
@@ -34,36 +36,42 @@ import static uz.nt.uzumclone.additional.AppStatusMessages.*;
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
+    private final ImageQualityRepository imageQualityRepository;
     private final ImageRepository imageRepository;
     private final ExecutorService executorService;
     @Override
     public ResponseDto<Integer> fileUpload(UploadImageDto file) {
-        Image imageEntity = new Image();
-        imageEntity.setExt(file.getImage().getOriginalFilename().substring(file.getImage().getOriginalFilename().lastIndexOf(".")));
-        imageEntity.setCreatedAt(LocalDateTime.now());
+        ImageQuality imageQualityEntity = new ImageQuality();
+        imageQualityEntity.setExt(file.getImage().getOriginalFilename().substring(file.getImage().getOriginalFilename().lastIndexOf(".")));
+        imageQualityEntity.setCreatedAt(LocalDateTime.now());
+        imageQualityEntity.setQuality(file.getQuality().getName());
 
         try{
             Future<String> large = executorService.submit(()-> {
                 System.out.println("task 1 running: "+Thread.currentThread().getName()+" thread");
-                return saveLargeSize(file.getImage(), imageEntity.getExt());
+                return saveLargeSize(file.getImage(), imageQualityEntity.getExt());
             });
             Future<String> medium = executorService.submit(()-> {
                 System.out.println("task 2 running: "+Thread.currentThread().getName()+" thread");
-                return saveMediumSize(file.getImage(), imageEntity.getExt());
+                return saveMediumSize(file.getImage(), imageQualityEntity.getExt());
             });
             Future<String> small = executorService.submit(()-> {
                 System.out.println("task 3 running: "+Thread.currentThread().getName()+" thread");
-                return saveSmallSize(file.getImage(), imageEntity.getExt());
+                return saveSmallSize(file.getImage(), imageQualityEntity.getExt());
             });
 
-            imageEntity.setPathLarge(large.get());
-            imageEntity.setPathMedium(medium.get());
-            imageEntity.setPathSmall(small.get());
+            imageQualityEntity.setPathLarge(large.get());
+            imageQualityEntity.setPathMedium(medium.get());
+            imageQualityEntity.setPathSmall(small.get());
 
-            imageEntity.setProductDetails(new ProductDetails(1));
 
             executorService.shutdown();
-            Image savedImage = imageRepository.save(imageEntity);
+            Image image = new Image();
+            image.setProductDetails(new ProductDetails(1));
+            Image save = imageRepository.save(image);
+            imageQualityEntity.setImage(save);
+            ImageQuality savedImage = imageQualityRepository.save(imageQualityEntity);
+
 
             return ResponseDto.<Integer>builder()
                     .data(savedImage.getId())
@@ -91,7 +99,7 @@ public class ImageServiceImpl implements ImageService {
         }
         FileInputStream image = null;
 
-        Optional<Image> optional = imageRepository.findById(fileId);
+        Optional<ImageQuality> optional = imageQualityRepository.findById(fileId);
 
         if (optional.isEmpty()) {
             return ResponseDto.<byte[]>builder()

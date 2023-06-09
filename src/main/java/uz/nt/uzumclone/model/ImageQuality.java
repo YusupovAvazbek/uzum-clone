@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
+import uz.nt.uzumclone.enums.ImageQualityType;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +24,7 @@ public class ImageQuality {
     private String pathMedium;
     private String pathSmall;
     private String ext;
-    private String quality;
+    private String  quality;
     @ManyToOne(fetch = FetchType.LAZY)
     private Image image;
     @CreatedDate

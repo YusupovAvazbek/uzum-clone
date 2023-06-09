@@ -45,7 +45,7 @@ public class MailServiceImpl implements MailService {
 //          context.setVariable("productList",productList);
 //          String main = templateEngine.process(getHtml, context);
 //          message.setText(main,true);
-            message.setText(getHtml);
+            message.setText(getHtml,true);
             mailSender.send(mimeMessage);
             log.info("sent e-mail to User '{}'",to);
             return ResponseDto.<Boolean>builder()

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
+import uz.nt.uzumclone.enums.ImageQualityType;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 public class UploadImageDto {
     private Integer ProductDetailId;
-    private String quality;
+    private ImageQualityType quality;
     private MultipartFile image;
 
 }
