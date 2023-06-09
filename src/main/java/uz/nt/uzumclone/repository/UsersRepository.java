@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface UsersRepository extends JpaRepository<Users, Integer> {
     Optional<Users> findByIdAndIsActive(Integer id, short i);
 
+    Optional<Users> findFirstByEmail(String email);
+
     Optional<Users> findFirstByPhoneNumberAndIsActive(String phoneNumber, short i);
     @Query(value = "INSERT INTO liked_products(user_id, product_id) VALUES (:userId, :productId)", nativeQuery = true)
     void insertLike(@Param("userId") Integer userId, @Param("productId") Integer productId);

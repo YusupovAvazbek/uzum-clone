@@ -1,6 +1,8 @@
 package uz.nt.uzumclone.service.Impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import uz.nt.uzumclone.dto.ResponseDto;
 import uz.nt.uzumclone.dto.UsersDto;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 import static uz.nt.uzumclone.additional.AppStatusCodes.*;
 import static uz.nt.uzumclone.additional.AppStatusMessages.*;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UsersService {
@@ -22,6 +25,7 @@ public class UserServiceImpl implements UsersService {
     private final UsersRepository usersRepository;
     private final CartService cartService;
     private final ProductRepository productRepository;
+
     @Override
     public ResponseDto<UsersDto> addUser(UsersDto dto) {
         try {
@@ -45,7 +49,7 @@ public class UserServiceImpl implements UsersService {
 
     @Override
     public ResponseDto<UsersDto> updateUser(UsersDto usersDto) {
-        if (usersDto.getId() == null){
+        if (usersDto.getId() == null) {
             return ResponseDto.<UsersDto>builder()
                     .message(NULL_VALUE)
                     .code(VALIDATION_ERROR_CODE)
@@ -55,7 +59,7 @@ public class UserServiceImpl implements UsersService {
 
         Optional<Users> userOptional = usersRepository.findByIdAndIsActive(usersDto.getId(), (short) 1);
 
-        if (userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             return ResponseDto.<UsersDto>builder()
                     .message(NOT_FOUND)
                     .code(NOT_FOUND_ERROR_CODE)
@@ -79,7 +83,7 @@ public class UserServiceImpl implements UsersService {
                     .success(true)
                     .message(OK)
                     .build();
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseDto.<UsersDto>builder()
                     .data(userMapper.toDto(user))
                     .code(DATABASE_ERROR_CODE)
@@ -101,7 +105,7 @@ public class UserServiceImpl implements UsersService {
                             .message(NOT_FOUND)
                             .code(NOT_FOUND_ERROR_CODE)
                             .build());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseDto.<UsersDto>builder()
                     .message(e.getMessage())
                     .success(true)
@@ -123,7 +127,7 @@ public class UserServiceImpl implements UsersService {
                             .message(NOT_FOUND)
                             .code(NOT_FOUND_ERROR_CODE)
                             .build());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseDto.<UsersDto>builder()
                     .message(e.getMessage())
                     .success(true)
@@ -131,16 +135,17 @@ public class UserServiceImpl implements UsersService {
                     .build();
         }
     }
+
     @Override
     public ResponseDto<UsersDto> deleteUser(Integer id) {
-        Optional<Users> user=usersRepository.findByIdAndIsActive(id,(short)1);
-        if(user.isEmpty()) {
+        Optional<Users> user = usersRepository.findByIdAndIsActive(id, (short) 1);
+        if (user.isEmpty()) {
             return (ResponseDto.<UsersDto>builder()
                     .message(NOT_FOUND)
                     .code(NOT_FOUND_ERROR_CODE)
                     .build());
         }
-        Users delUser= user.get();
+        Users delUser = user.get();
         delUser.setIsActive((short) 0);
         try {
             usersRepository.save(delUser);
@@ -150,7 +155,7 @@ public class UserServiceImpl implements UsersService {
                     .data(userMapper.toDto(delUser))
                     .build();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseDto.<UsersDto>builder()
                     .success(false)
                     .message(e.getMessage())
@@ -159,4 +164,11 @@ public class UserServiceImpl implements UsersService {
         }
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Users> users = usersRepository.findFirstByEmail(username);
+        if (users.isEmpty()) throw new UsernameNotFoundException("User with email " + username + " is not found");
+
+        return userMapper.toDto(users.get());
+    }
 }
