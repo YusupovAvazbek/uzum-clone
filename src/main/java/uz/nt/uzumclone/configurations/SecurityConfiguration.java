@@ -36,11 +36,11 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
-    @Value("${spring.database.url}")
+    @Value("${spring.datasource.url}")
     private String url;
-    @Value("${spring.database.username}")
+    @Value("${spring.datasource.username}")
     private String username;
-    @Value("${spring.database.password}")
+    @Value("${spring.datasource.password}")
     private String password;
 
     @Autowired
