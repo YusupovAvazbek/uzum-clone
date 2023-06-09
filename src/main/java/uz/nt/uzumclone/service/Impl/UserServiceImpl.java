@@ -1,6 +1,10 @@
 package uz.nt.uzumclone.service.Impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +18,7 @@ import uz.nt.uzumclone.model.Users;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.UsersRepository;
 import uz.nt.uzumclone.security.JwtService;
+import uz.nt.uzumclone.security.UserRoles;
 import uz.nt.uzumclone.service.CartService;
 import uz.nt.uzumclone.service.UsersService;
 import uz.nt.uzumclone.service.mapper.UsersMapper;
@@ -174,8 +179,8 @@ public class UserServiceImpl implements UsersService {
 
     @Override
     public ResponseDto<String> login(LoginDto loginDto) {
-        UsersDto users = loadUserByUsername(loginDto.getUsername());
-        if (!passwordEncoder.matches(loginDto.getPassword(), users.getPassword())){
+        UserDetails users = loadUserByUsername(loginDto.getUsername());
+        if (!passwordEncoder.matches(loginDto.getPassword(), users.getPassword())) {
             return ResponseDto.<String>builder()
                     .message("Password is not correct")
                     .code(AppStatusCodes.VALIDATION_ERROR_CODE)
@@ -190,10 +195,15 @@ public class UserServiceImpl implements UsersService {
     }
 
     @Override
-    public UsersDto loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Users> users = usersRepository.findFirstByEmail(username);
-        if (users.isEmpty()) throw new UsernameNotFoundException("User with email " + username + " is not found");
-
-        return userMapper.toDto(users.get());
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users user = usersRepository.findFirstByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User with email " + username + " is not found"));
+        return new User(user.getUsername(),
+                user.getPassword(),
+                UserRoles.valueOf(user.getRole())
+                        .getAuthorities().stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList());
     }
+
 }

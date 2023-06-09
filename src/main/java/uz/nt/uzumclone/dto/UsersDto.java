@@ -23,7 +23,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(value = {"password", "role", "authorities", "username", })
-public class UsersDto implements UserDetails {
+public class UsersDto {
     private Integer id;
     @Pattern(regexp = "\\+998 \\d{2} \\d{3} \\d{2} \\d{2}")
     private String phoneNumber;
@@ -39,32 +39,4 @@ public class UsersDto implements UserDetails {
     @Size(min = 3)
     private String password;
     private String role;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return UserRoles.valueOf(role)
-                .getAuthorities().stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
 }

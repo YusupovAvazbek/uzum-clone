@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import uz.nt.uzumclone.dto.UsersDto;
 import uz.nt.uzumclone.model.UserSession;
@@ -26,7 +27,7 @@ public class JwtService {
     @Autowired
     private Gson gson;
 
-    public String generateToken(UsersDto user){
+    public String generateToken(UserDetails user) {
         String uuid = UUID.randomUUID().toString();
         userSessionRepository.save(new UserSession(uuid, gson.toJson(user)));
 
@@ -37,20 +38,20 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims getClaims(String token){
+    public Claims getClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    public boolean isExpired(String token){
+    public boolean isExpired(String token) {
         return getClaims(token).getExpiration().getTime() < System.currentTimeMillis();
     }
 
-    public UsersDto getSubject(String token){
+    public UserDetails getSubject(String token) {
         String uuid = getClaims(token).getSubject();
-        return userSessionRepository.findById(uuid).map(s -> gson.fromJson(s.getUserInfo(), UsersDto.class))
+        return userSessionRepository.findById(uuid).map(s -> gson.fromJson(s.getUserInfo(), UserDetails.class))
                 .orElseThrow(() -> new JwtException("Token is expired"));
     }
 }
