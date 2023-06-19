@@ -1,12 +1,10 @@
 package uz.nt.uzumclone.service.Impl;
 
-import jakarta.validation.OverridesAttribute;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import uz.nt.uzumclone.dto.CategoryDto;
 import uz.nt.uzumclone.dto.*;
 import uz.nt.uzumclone.model.Category;
-import uz.nt.uzumclone.model.Product;
 import uz.nt.uzumclone.repository.CategoryRepository;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.service.CategoryService;
@@ -15,8 +13,6 @@ import uz.nt.uzumclone.service.mapper.CategoryMapper;
 import uz.nt.uzumclone.service.mapper.ProductMapper;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static uz.nt.uzumclone.additional.AppStatusCodes.*;
 import static uz.nt.uzumclone.additional.AppStatusMessages.*;

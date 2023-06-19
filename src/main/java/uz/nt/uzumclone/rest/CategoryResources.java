@@ -1,18 +1,11 @@
 package uz.nt.uzumclone.rest;
 
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
+import uz.nt.uzumclone.dto.CategoryDto;
 import uz.nt.uzumclone.dto.*;
-import uz.nt.uzumclone.model.Product;
-import uz.nt.uzumclone.projections.ProductProjection;
 import uz.nt.uzumclone.service.Impl.CategoryServiceImpl;
-
-import java.util.Map;
-import java.util.Set;
 
 import java.util.List;
 
