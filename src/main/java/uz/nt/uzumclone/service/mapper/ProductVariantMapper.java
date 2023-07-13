@@ -8,4 +8,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ProductVariantMapper extends CommonMapper<List<ProductVariantDto>, List<ProductVariant>> {
+    ProductVariant toEntity(ProductVariantDto productVariantDto);
+    ProductVariantDto toDto(ProductVariant productVariant);
 }

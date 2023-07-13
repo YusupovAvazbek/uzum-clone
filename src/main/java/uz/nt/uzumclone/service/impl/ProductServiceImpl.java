@@ -8,14 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uz.nt.uzumclone.dto.BrandDto;
-import uz.nt.uzumclone.dto.ProductDto;
-import uz.nt.uzumclone.dto.ProductVariantDto;
-import uz.nt.uzumclone.dto.ResponseDto;
-import uz.nt.uzumclone.model.Brand;
-import uz.nt.uzumclone.model.Product;
-import uz.nt.uzumclone.model.ProductVariant;
+import uz.nt.uzumclone.additional.AppStatusCodes;
+import uz.nt.uzumclone.additional.AppStatusMessages;
+import uz.nt.uzumclone.dto.*;
+import uz.nt.uzumclone.model.*;
 import uz.nt.uzumclone.projections.ProductProjection;
+import uz.nt.uzumclone.repository.ProductDetailsRepository;
 import uz.nt.uzumclone.repository.ProductRepository;
 import uz.nt.uzumclone.repository.ProductRepositoryImpl;
 import uz.nt.uzumclone.repository.ProductVariantRepository;
@@ -24,7 +22,9 @@ import uz.nt.uzumclone.service.ProductService;
 import uz.nt.uzumclone.service.mapper.CategoryMapper;
 import uz.nt.uzumclone.service.mapper.ProductMapper;
 import uz.nt.uzumclone.service.mapper.ProductVariantMapper;
+import uz.nt.uzumclone.service.mapper.VariantValueMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,19 +42,53 @@ public class ProductServiceImpl implements ProductService {
     private final BrandServiceImpl brandServices;
     private final ProductVariantMapper productVariantMapper;
     private final ProductVariantRepository productVariantRepository;
+    private final VariantValueMapper variantValueMapper;
+    private final ProductDetailsRepository productDetailsRepository;
 
     @Override
     public ResponseDto<ProductDto> addProduct(ProductDto productDto) {
-        Brand brand = brandServices.addBrand(productDto.getBrand().getName());
-        Product product = productMapper.toEntity(productDto);
-        product.setBrand(brand);
         try {
-            Product save = productRepository.save(product);
+            Brand brand = brandServices.addBrand(productDto.getBrand().getName());
+            Product product = productMapper.toEntity(productDto);
+            product.setBrand(brand);
+
+            Product savedProduct = productRepository.save(product);
+
+            List<ProductVariantDto> productVariants = productDto.getProductVariants();
+            List<ProductVariant> savedVariants = new ArrayList<>();
+
+
+
+            if (productVariants != null && !productVariants.isEmpty()) {
+                for (ProductVariantDto variantDto : productVariants) {
+                    ProductVariant variant = productVariantMapper.toEntity(variantDto);
+                    variant.setProduct(savedProduct);
+                    ProductVariant savedVariant = productVariantRepository.save(variant);
+                    savedVariants.add(savedVariant);
+
+                    List<VariantValueDto> variantValues = variantDto.getVariantValueIds();
+                    if (variantValues != null && !variantValues.isEmpty()) {
+                        for (VariantValueDto valueDto : variantValues) {
+                            VariantValue value = variantValueMapper.toEntity(valueDto);
+
+                            ProductDetails productDetails = new ProductDetails();
+                            productDetails.setProductVariant(savedVariant);
+                            productDetails.setVariantValue(value);
+
+                            savedVariant.getProductDetails().add(productDetails);
+                            productDetailsRepository.save(productDetails);
+                        }
+                    }
+                }
+            }
+
+            Product updatedProduct = productRepository.save(savedProduct);
 
             return ResponseDto.<ProductDto>builder()
                     .success(true)
-                    .data(productMapper.toDto(save))
-                    .message("OK")
+                    .data(productMapper.toDto(updatedProduct))
+                    .message(OK)
+                    .code(OK_CODE)
                     .build();
         } catch (Exception e) {
             return ResponseDto.<ProductDto>builder()
