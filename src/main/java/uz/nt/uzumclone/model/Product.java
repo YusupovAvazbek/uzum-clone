@@ -41,6 +41,8 @@ public class Product {
     private Set<Users> favourited = new HashSet<>();
     @ManyToMany(mappedBy = "viewed")
     private Set<Users> viewed = new HashSet<>();
+    @ManyToMany(mappedBy = "products")
+    private Set<Cart> carts;
     private Boolean isAvailable;
     @CreatedDate
     @CreationTimestamp
